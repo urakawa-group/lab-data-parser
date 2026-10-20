@@ -1,4 +1,4 @@
-# PhD Parser
+# Urakawa Group Data Parser
 
 Helper functions to read and process data from the instruments of the Urakawa
 group at TU Delft. The package gets experimental data out of raw instrument
