@@ -47,3 +47,18 @@ def test_threshold_columns_get_distinct_names():
     assert len(set(threshold_columns)) == len(threshold_columns)
     assert all(" " not in column for column in threshold_columns)
     assert meta["n_cycles"] == len(frame) if "n_cycles" in meta else True
+
+
+def test_mz_is_a_property():
+    np.testing.assert_allclose(make_ms().mz, [28.0, 44.0])
+
+
+def test_quadstar_default_origin_is_the_recorded_start():
+    ms = MSData.from_quadstar_asc(ASC_FILE)
+    assert ms.tos_start == pd.Timestamp("2026-03-26 14:57:59", tz="Europe/Amsterdam")
+    assert ms.timestamps is not None and ms.tos[0] == pytest.approx(0.0)
+
+
+def test_quadstar_options_are_keyword_only():
+    with pytest.raises(TypeError):
+        MSData.from_quadstar_asc(ASC_FILE, "2026-03-26 14:57")

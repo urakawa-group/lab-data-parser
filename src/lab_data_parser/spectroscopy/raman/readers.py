@@ -88,6 +88,7 @@ class RamanData:
     def from_btc655n_export(
         cls,
         filepath: Union[str, Path],
+        *,
         y_key: str = "Raw data #1",
         remove_empty: bool = True,
     ) -> SpectroscopyData:
@@ -145,6 +146,7 @@ class RamanData:
     def from_renishaw_txt(
         cls,
         filepath: Union[str, Path],
+        *,
         excitation_wavelength_nm: float,
     ) -> SpectroscopyData:
         """Load a Renishaw WiRe plain-text export (shift already in cm⁻¹).

@@ -10,7 +10,7 @@ import xarray as xr
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from lab_data_parser._selection import EmptyWindow, window_mask
-from lab_data_parser._time import TimeOriginMixin
+from lab_data_parser._time import TimeOriginMixin, encode_tos_start
 from lab_data_parser.history import HistoryMixin
 from lab_data_parser.history import HISTORY_KEY, decode_attrs, encode_attrs, get_history, records_step
 from lab_data_parser.labview.b67box5 import read as read_b67box5
@@ -50,7 +50,7 @@ class LVData(TimeOriginMixin, HistoryMixin, BaseModel):
             if tos_start is None:
                 store.pop("tos_start", None)
             else:
-                store["tos_start"] = tos_start.isoformat()
+                store["tos_start"] = encode_tos_start(tos_start)
         ds.attrs = attrs
         return LVData(ds=ds, metadata=metadata)
 
@@ -591,7 +591,7 @@ class LVData(TimeOriginMixin, HistoryMixin, BaseModel):
         }
 
         meta = dict(metadata or {})
-        meta["tos_start"] = tos_start.isoformat()
+        meta["tos_start"] = encode_tos_start(tos_start)
 
         ds = xr.Dataset(
             data_vars=data_vars,
@@ -628,6 +628,7 @@ class LVData(TimeOriginMixin, HistoryMixin, BaseModel):
     def from_b67_box5_txt(
         cls,
         filepath: Union[str, Path],
+        *,
         tos_start: Optional[pd.Timestamp] = None,
         keep_unknown_channels: bool = False,
     ) -> "LVData":

@@ -16,6 +16,7 @@ from scipy import constants as const
 from lab_data_parser.spectroscopy._common import (
     _MAP_DIMS,
     DataType,
+    _check_tos_tolerance,
 )
 from lab_data_parser.spectroscopy.units import axis_label as _axis_label, from_wavenumber, quantity_of
 
@@ -596,13 +597,7 @@ class _AxisMixin:
         targets = [float(target_tos)] if scalar_input else [float(t) for t in target_tos]
 
         def _id_for(t: float) -> int:
-            if tolerance_seconds is not None:
-                nearest_dist = float(np.abs(self.tos - t).min())
-                if nearest_dist > tolerance_seconds:
-                    raise ValueError(
-                        f"Requested tos {t:.1f}s is {nearest_dist:.1f}s from the nearest scan "
-                        f"(tolerance: {tolerance_seconds:.1f}s)"
-                    )
+            _check_tos_tolerance(self.tos, t, tolerance_seconds)
             return int(self.ds["scan"].sel(tos=t, method=method).item())
 
         ids = np.array([_id_for(t) for t in targets], dtype=int)
@@ -671,11 +666,7 @@ class _AxisMixin:
             """Index of the scan nearest to t, with tolerance check."""
             dists = np.abs(tos_values - t)
             idx = int(dists.argmin())
-            if tolerance_seconds is not None and dists[idx] > tolerance_seconds:
-                raise ValueError(
-                    f"Requested tos {t:.1f}s is {dists[idx]:.1f}s from the nearest scan "
-                    f"(tolerance: {tolerance_seconds:.1f}s)"
-                )
+            _check_tos_tolerance(tos_values, t, tolerance_seconds)
             return idx
 
         def _window_indices(anchor_idx: int) -> slice:
@@ -804,13 +795,7 @@ class _AxisMixin:
         targets = [float(target_tos)] if scalar_input else [float(t) for t in target_tos]
 
         def _fetch_one(t: float) -> npt.NDArray:
-            if tolerance_seconds is not None:
-                nearest_dist = float(np.abs(self.tos - t).min())
-                if nearest_dist > tolerance_seconds:
-                    raise ValueError(
-                        f"Requested tos {t:.1f}s is {nearest_dist:.1f}s from the nearest scan "
-                        f"(tolerance: {tolerance_seconds:.1f}s)"
-                    )
+            _check_tos_tolerance(self.tos, t, tolerance_seconds)
             return var.sel(tos=t, method=method).values
 
         results = np.vstack([_fetch_one(t) for t in targets])

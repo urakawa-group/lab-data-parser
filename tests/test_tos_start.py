@@ -196,3 +196,39 @@ def test_ms_survives_netcdf_round_trip(tmp_path):
 
     assert loaded.tos_start == ms.tos_start
     np.testing.assert_allclose(loaded.tos, ms.tos)
+
+
+# ---------------------------------------------------------------- the stored zone
+
+def test_origin_keeps_its_named_timezone():
+    from lab_data_parser._time import encode_tos_start
+
+    assert encode_tos_start(TOS_START) == "2026-04-21T14:00:00+02:00[Europe/Amsterdam]"
+    for data in (make_ir(), make_lv(), make_ms()):
+        assert str(data.tos_start.tz) == "Europe/Amsterdam"
+
+
+def test_timestamps_follow_daylight_saving_of_the_origin_zone():
+    # data recorded in winter, re-anchored to a summer origin: the timestamps keep the winter offset
+    winter_start = pd.Timestamp("2026-03-26 14:00", tz="Europe/Amsterdam")
+    ms = MSData.from_arrays(cycle=np.arange(3), channels={0: np.array([28.0])}, values={0: np.ones((3, 1))},
+                            tos=TOS, tos_start=winter_start)
+    summer = ms.with_tos_start(pd.Timestamp("2026-05-01 12:00", tz="Europe/Amsterdam"))
+    assert summer.timestamps[0] == winter_start
+    assert summer.timestamps[0].utcoffset() == pd.Timedelta(hours=1)
+    assert summer.timestamps[0].strftime("%H:%M") == "14:00"
+
+
+def test_fixed_offset_and_old_strings_still_decode():
+    from lab_data_parser._time import decode_tos_start, encode_tos_start
+
+    fixed = pd.Timestamp("2026-04-21T14:00:00+02:00")
+    assert encode_tos_start(fixed) == "2026-04-21T14:00:00+02:00"
+    assert decode_tos_start("2026-04-21T14:00:00+02:00") == fixed
+    assert decode_tos_start(None) is None
+
+
+def test_named_timezone_survives_netcdf(tmp_path):
+    ms = make_ms()
+    ms.to_netcdf(tmp_path / "ms.nc")
+    assert str(MSData.from_netcdf(tmp_path / "ms.nc").tos_start.tz) == "Europe/Amsterdam"

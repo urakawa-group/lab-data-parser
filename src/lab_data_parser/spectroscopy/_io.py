@@ -13,6 +13,7 @@ import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 
+from lab_data_parser._time import encode_tos_start
 from lab_data_parser.history import HISTORY_KEY, decode_attrs, encode_attrs, records_step, to_json_safe
 from lab_data_parser.spectroscopy._common import (
     _DATA_TYPE_TO_SCP_TITLE,
@@ -335,7 +336,7 @@ class _IOMixin:
 
         parsed_tos_start = cls._parse_tos_start(tos_start, raw["meta"].get("tos_start"), strict_tos_start)
         if parsed_tos_start is not None:
-            attrs["tos_start"] = parsed_tos_start.isoformat()
+            attrs["tos_start"] = encode_tos_start(parsed_tos_start)
 
         ds = cls._build_ds(
             np.asarray(raw["data"]["x"], dtype=float) * wavenumber_to_si_factor,
@@ -381,7 +382,7 @@ class _IOMixin:
         if excitation_wavelength_nm is not None:
             attrs["excitation_wavelength_nm"] = float(excitation_wavelength_nm)
         if tos_start is not None:
-            attrs["tos_start"] = pd.Timestamp(tos_start).isoformat()
+            attrs["tos_start"] = encode_tos_start(pd.Timestamp(tos_start))
         ds = cls._build_ds(shift_si, values, tos=tos, attrs=attrs)
         if map_coords:
             ds = ds.assign_coords(map_coords)

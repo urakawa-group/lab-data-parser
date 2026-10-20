@@ -239,6 +239,7 @@ class TGAData(BaseModel):
     def from_e2290(
         cls,
         path: str | Path,
+        *,
         baseline_path: Optional[str | Path] = None,
         in_kelvin: bool = True,
     ) -> "TGAData":

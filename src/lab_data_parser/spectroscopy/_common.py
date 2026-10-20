@@ -2,6 +2,7 @@
 
 from typing import Literal, Optional
 
+import numpy as np
 import numpy.typing as npt
 import xarray as xr
 
@@ -90,3 +91,20 @@ def _is_spectroscopy_data(obj) -> bool:
     from lab_data_parser.spectroscopy.core import SpectroscopyData
 
     return isinstance(obj, SpectroscopyData)
+
+
+def _check_tos_tolerance(tos: npt.ArrayLike, target: float, tolerance_seconds: Optional[float]) -> None:
+    """Raise if ``target`` is farther than ``tolerance_seconds`` from every scan; ``None`` disables the check."""
+    if tolerance_seconds is None:
+        return
+    tos = np.asarray(tos, dtype=float)
+    nearest_distance = float(np.abs(tos - target).min())
+    if nearest_distance <= tolerance_seconds:
+        return
+    spacing = float(np.median(np.diff(np.sort(tos)))) if tos.size > 1 else float("nan")
+    raise ValueError(
+        f"Requested tos {target:.1f}s is {nearest_distance:.1f}s from the nearest scan "
+        f"(tolerance: {tolerance_seconds:.1f}s; median scan spacing: {spacing:.1f}s). "
+        "Pick a target closer to a scan, raise tolerance_seconds, or pass tolerance_seconds=None "
+        "to take the nearest scan whatever its distance."
+    )

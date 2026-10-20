@@ -108,3 +108,14 @@ def test_average_scans_by_tos_with_unsorted_targets_stays_in_time_order(series):
     for position, target in enumerate([0.0, 20.0, 40.0]):
         np.testing.assert_allclose(averaged.values[position], corrected.get_scan_by_tos(target))
         np.testing.assert_allclose(averaged.baseline[position], corrected.get_baseline_by_tos(target))
+
+
+def test_tolerance_error_names_the_scan_spacing_and_the_way_out():
+    from lab_data_parser import SpectroscopyData
+
+    sparse = SpectroscopyData.from_arrays(
+        np.linspace(1000.0, 4000.0, 11), np.ones((3, 11)), tos=np.array([0.0, 600.0, 1200.0]),
+    )
+    with pytest.raises(ValueError, match=r"median scan spacing: 600\.0s.*tolerance_seconds=None"):
+        sparse.average_scans_by_tos(300.0, time_window=60)
+    assert sparse.average_scans_by_tos(300.0, time_window=60, tolerance_seconds=None).values.shape == (1, 11)
