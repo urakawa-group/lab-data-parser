@@ -1,20 +1,20 @@
 """The core data containers are reachable from the package root, as the same objects as in their subpackages."""
-import phd_parser as pp
+import lab_data_parser as ldp
 
 
 def test_core_classes_at_the_top_level():
-    assert pp.GCData is pp.chromatography.GCData
-    assert pp.IRData is pp.spectroscopy.infrared.IRData
-    assert pp.LVData is pp.labview.LVData
-    assert pp.MSData is pp.massspec.MSData
-    assert pp.PhysisorptionData is pp.physisorption.PhysisorptionData
-    assert pp.RamanData is pp.spectroscopy.raman.RamanData
-    assert pp.TGAData is pp.tga.TGAData
-    assert pp.TPRData is pp.tpr.TPRData
-    assert pp.XRDData is pp.xrd.XRDData
-    assert pp.XPSData is pp.spectroscopy.xps.XPSData
-    assert pp.rename_species is pp.naming.rename_species
+    assert ldp.GCData is ldp.chromatography.GCData
+    assert ldp.IRData is ldp.spectroscopy.infrared.IRData
+    assert ldp.LVData is ldp.labview.LVData
+    assert ldp.MSData is ldp.massspec.MSData
+    assert ldp.PhysisorptionData is ldp.physisorption.PhysisorptionData
+    assert ldp.RamanData is ldp.spectroscopy.raman.RamanData
+    assert ldp.TGAData is ldp.tga.TGAData
+    assert ldp.TPRData is ldp.tpr.TPRData
+    assert ldp.XRDData is ldp.xrd.XRDData
+    assert ldp.XPSData is ldp.spectroscopy.xps.XPSData
+    assert ldp.rename_species is ldp.naming.rename_species
 
 
 def test_from_import():
-    from phd_parser import GCData, LVData, rename_species  # noqa: F401
+    from lab_data_parser import GCData, LVData, rename_species  # noqa: F401

@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 from scipy import constants as const
 
-from phd_parser.spectroscopy import IRData, RamanData, SpectroscopyData, units
+from lab_data_parser.spectroscopy import IRData, RamanData, SpectroscopyData, units
 
 AXIS_PER_CM = np.array([400.0, 1000.0, 2000.0, 4000.0])
 

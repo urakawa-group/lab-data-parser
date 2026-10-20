@@ -1,11 +1,12 @@
 [project]
-name = "phd_parser"
+name = "lab-data-parser"
 version = "0.2.0"
 description = "Read and process the raw data of catalysis lab instruments (IR, Raman, MS, GC, LabView, XRD, TGA, physisorption) into one consistent xarray form, with provenance."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
-authors = [{ name = "Julius Sommer", email = "julius_sommer@mailbox.org" }]
+authors = [{ name = "Urakawa Group, TU Delft" }]
+maintainers = [{ name = "Julius Sommer" }, { name = "Manoj Coppens" }]
 requires-python = ">=3.13"
 keywords = ["catalysis", "spectroscopy", "chromatography", "mass-spectrometry", "xarray", "data-parsing"]
 classifiers = [
@@ -33,7 +34,7 @@ spectrochempy = ["spectrochempy>=0.8.1"]
 ramanspy = ["ramanspy>=0.2.10"]
 # reading .spa files from http(s) URLs
 url = ["requests>=2.32"]
-all = ["phd_parser[spectrochempy,ramanspy,url]"]
+all = ["lab-data-parser[spectrochempy,ramanspy,url]"]
 
 [dependency-groups]
 dev = [
@@ -46,7 +47,7 @@ dev = [
 ]
 
 [project.urls]
-Repository = "https://github.com/js-chemE/PhD_parser"
+Repository = "https://github.com/urakawa-group/lab-data-parser"
 
 [build-system]
 requires = ["setuptools>=77"]
@@ -59,11 +60,11 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-"phd_parser.naming.species" = ["*.json"]
+"lab_data_parser.naming.species" = ["*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
 filterwarnings = [
-    "error::DeprecationWarning:phd_parser",
+    "error::DeprecationWarning:lab_data_parser",
 ]

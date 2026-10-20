@@ -4,10 +4,10 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from phd_parser.spectroscopy.xps import XPSData
-from phd_parser.spectroscopy.xps import fitting
-from phd_parser.kernels import gaussian_lorentzian_product, parse_lineshape
-from phd_parser.spectroscopy.xps.fitting import DOUBLETS, PeakSpec, doublet, fit_peaks
+from lab_data_parser.spectroscopy.xps import XPSData
+from lab_data_parser.spectroscopy.xps import fitting
+from lab_data_parser.kernels import gaussian_lorentzian_product, parse_lineshape
+from lab_data_parser.spectroscopy.xps.fitting import DOUBLETS, PeakSpec, doublet, fit_peaks
 
 FIXTURES = Path(__file__).parent
 AVG_MO3D = FIXTURES / "avantage" / "Mo3d Scan.avg"
@@ -88,7 +88,7 @@ def test_mo3d_fixture_fit_is_mostly_molybdenum_six():
 
     assert fitted.has_fit and fitted.has_background and fitted.envelope is not None
     assert fitted.ds["peaks"].shape == (4, fitted.n_points)
-    assert fitted.ds.attrs["analysis_source"] == "phd_parser"
+    assert fitted.ds.attrs["analysis_source"] == "lab_data_parser"
     summary = fitted.ds.attrs["fit"]
     assert summary["success"] and summary["n_free_parameters"] == 4 and summary["background"]["method"] == "shirley"
     assert [spec["name"] for spec in summary["specs"]] == ["Mo(VI) 3d5/2", "Mo(VI) 3d3/2", "Mo(V) 3d5/2", "Mo(V) 3d3/2"]

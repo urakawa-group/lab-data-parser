@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 import xarray as xr
 
-from phd_parser.spectroscopy import RamanData, SpectroscopyData
+from lab_data_parser.spectroscopy import RamanData, SpectroscopyData
 
 SHIFT_PER_CM = np.linspace(200.0, 3200.0, 151)
 

@@ -5,14 +5,14 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from phd_parser.spectroscopy import RamanData, SpectroscopyData
-from phd_parser.spectroscopy.raman import renishaw
+from lab_data_parser.spectroscopy import RamanData, SpectroscopyData
+from lab_data_parser.spectroscopy.raman import renishaw
 
 FIXTURES = Path(__file__).parent / "renishaw"
-WDF_532 = FIXTURES / "TiO2_Julius_532_1acc_01.wdf"
-TXT_532 = FIXTURES / "TiO2_Julius_532_1acc_01.txt"
-WDF_785 = FIXTURES / "TiO2_Julius_785_1acc_01.wdf"
-TXT_785 = FIXTURES / "TiO2_Julius_785_1acc_01.txt"
+WDF_532 = FIXTURES / "TiO2_532_1acc_01.wdf"
+TXT_532 = FIXTURES / "TiO2_532_1acc_01.txt"
+WDF_785 = FIXTURES / "TiO2_785_1acc_01.wdf"
+TXT_785 = FIXTURES / "TiO2_785_1acc_01.txt"
 
 
 def test_read_export_txt_keeps_every_row():

@@ -633,6 +633,74 @@ wheels = [
 ]
 
 [[package]]
+name = "lab-data-parser"
+version = "0.2.0"
+source = { editable = "." }
+dependencies = [
+    { name = "h5netcdf" },
+    { name = "h5py" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "pydantic" },
+    { name = "scipy" },
+    { name = "xarray" },
+    { name = "xlrd" },
+]
+
+[package.optional-dependencies]
+all = [
+    { name = "ramanspy" },
+    { name = "requests" },
+    { name = "spectrochempy" },
+]
+ramanspy = [
+    { name = "ramanspy" },
+]
+spectrochempy = [
+    { name = "spectrochempy" },
+]
+url = [
+    { name = "requests" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "ipykernel" },
+    { name = "matplotlib" },
+    { name = "pytest" },
+    { name = "ramanspy" },
+    { name = "requests" },
+    { name = "spectrochempy" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "h5netcdf", specifier = ">=1.8.1" },
+    { name = "h5py", specifier = ">=3.16.0" },
+    { name = "lab-data-parser", extras = ["spectrochempy", "ramanspy", "url"], marker = "extra == 'all'" },
+    { name = "numpy", specifier = ">=2.4.3" },
+    { name = "pandas", specifier = ">=3.0.1" },
+    { name = "pydantic", specifier = ">=2.12.5" },
+    { name = "ramanspy", marker = "extra == 'ramanspy'", specifier = ">=0.2.10" },
+    { name = "requests", marker = "extra == 'url'", specifier = ">=2.32" },
+    { name = "scipy", specifier = ">=1.17.1" },
+    { name = "spectrochempy", marker = "extra == 'spectrochempy'", specifier = ">=0.8.1" },
+    { name = "xarray", specifier = ">=2026.4.0" },
+    { name = "xlrd", specifier = ">=2.0.2" },
+]
+provides-extras = ["spectrochempy", "ramanspy", "url", "all"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "ipykernel", specifier = ">=7.2.0" },
+    { name = "matplotlib", specifier = ">=3.10.8" },
+    { name = "pytest", specifier = ">=9.0.2" },
+    { name = "ramanspy", specifier = ">=0.2.10" },
+    { name = "requests", specifier = ">=2.32" },
+    { name = "spectrochempy", specifier = ">=0.8.1" },
+]
+
+[[package]]
 name = "lazy-loader"
 version = "0.5"
 source = { registry = "https://pypi.org/simple" }
@@ -885,74 +953,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz", hash = "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f", size = 166450, upload-time = "2023-11-25T09:07:26.339Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9e/c3/059298687310d527a58bb01f3b1965787ee3b40dce76752eda8b44e9a2c5/pexpect-4.9.0-py2.py3-none-any.whl", hash = "sha256:7236d1e080e4936be2dc3e326cec0af72acf9212a7e1d060210e70a47e253523", size = 63772, upload-time = "2023-11-25T06:56:14.81Z" },
-]
-
-[[package]]
-name = "phd-parser"
-version = "0.2.0"
-source = { editable = "." }
-dependencies = [
-    { name = "h5netcdf" },
-    { name = "h5py" },
-    { name = "numpy" },
-    { name = "pandas" },
-    { name = "pydantic" },
-    { name = "scipy" },
-    { name = "xarray" },
-    { name = "xlrd" },
-]
-
-[package.optional-dependencies]
-all = [
-    { name = "ramanspy" },
-    { name = "requests" },
-    { name = "spectrochempy" },
-]
-ramanspy = [
-    { name = "ramanspy" },
-]
-spectrochempy = [
-    { name = "spectrochempy" },
-]
-url = [
-    { name = "requests" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "ipykernel" },
-    { name = "matplotlib" },
-    { name = "pytest" },
-    { name = "ramanspy" },
-    { name = "requests" },
-    { name = "spectrochempy" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "h5netcdf", specifier = ">=1.8.1" },
-    { name = "h5py", specifier = ">=3.16.0" },
-    { name = "numpy", specifier = ">=2.4.3" },
-    { name = "pandas", specifier = ">=3.0.1" },
-    { name = "phd-parser", extras = ["spectrochempy", "ramanspy", "url"], marker = "extra == 'all'" },
-    { name = "pydantic", specifier = ">=2.12.5" },
-    { name = "ramanspy", marker = "extra == 'ramanspy'", specifier = ">=0.2.10" },
-    { name = "requests", marker = "extra == 'url'", specifier = ">=2.32" },
-    { name = "scipy", specifier = ">=1.17.1" },
-    { name = "spectrochempy", marker = "extra == 'spectrochempy'", specifier = ">=0.8.1" },
-    { name = "xarray", specifier = ">=2026.4.0" },
-    { name = "xlrd", specifier = ">=2.0.2" },
-]
-provides-extras = ["spectrochempy", "ramanspy", "url", "all"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "ipykernel", specifier = ">=7.2.0" },
-    { name = "matplotlib", specifier = ">=3.10.8" },
-    { name = "pytest", specifier = ">=9.0.2" },
-    { name = "ramanspy", specifier = ">=0.2.10" },
-    { name = "requests", specifier = ">=2.32" },
-    { name = "spectrochempy", specifier = ">=0.8.1" },
 ]
 
 [[package]]

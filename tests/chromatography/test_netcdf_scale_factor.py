@@ -1,7 +1,7 @@
 """A chromatogram with a scale factor survives NetCDF whether or not it can be packed as integer counts."""
 import numpy as np
 
-from phd_parser.chromatography import GCData
+from lab_data_parser.chromatography import GCData
 
 
 def make_gc(values):

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from phd_parser.physisorption.tristar import _extract_bet, _extract_isotherm, _parse_value, read_export
+from lab_data_parser.physisorption.tristar import _extract_bet, _extract_isotherm, _parse_value, read_export
 
 MOCK_FILE_PATH = os.path.join(os.path.dirname(__file__), "tristar", "2026-N-198.XLS")
 

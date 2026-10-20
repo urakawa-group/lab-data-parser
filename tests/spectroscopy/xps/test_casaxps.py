@@ -3,7 +3,7 @@ import numpy as np
 import numpy.typing as npt
 import os
 
-from phd_parser.spectroscopy.xps.casaxps import read_export, extract_lines, split_lines, parse_metadata_lines, parse_data_lines
+from lab_data_parser.spectroscopy.xps.casaxps import read_export, extract_lines, split_lines, parse_metadata_lines, parse_data_lines
 
 MOCK_FILE_PATH = os.path.join(os.path.dirname(__file__), "casaxps_export_single.txt")
 MOCK_FILE_PATH_DOUBLE = os.path.join(os.path.dirname(__file__), "casaxps_export_double.txt")
@@ -63,7 +63,7 @@ def test_read_export():
     assert not be_df.empty, "Binding energy DataFrame should not be empty"
 
 def test_three_peak_table_is_not_read_as_key_value_pairs(tmp_path):
-    from phd_parser.spectroscopy.xps.casaxps import parse_metadata_lines
+    from lab_data_parser.spectroscopy.xps.casaxps import parse_metadata_lines
     meta = parse_metadata_lines([
         "\tCharacteristic Energy eV\t1.486680e+003\tAcquisition Time s\t5.000000e-001",
         "Name\t\tTi(IV) 2p3/2\tTi(IV) 2p1/2\tTi 2p\t",

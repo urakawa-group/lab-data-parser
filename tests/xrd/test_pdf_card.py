@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from phd_parser.xrd import ReferenceCard, read_pdf_card
-from phd_parser.xrd.pdf_card import REFLECTION_COLUMNS, parse_card_name
+from lab_data_parser.xrd import ReferenceCard, read_pdf_card
+from lab_data_parser.xrd.pdf_card import REFLECTION_COLUMNS, parse_card_name
 
 HERE = Path(__file__).parent
 ANATASE = HERE / "PDF 78-2486_TiO2-Anatase.txt"

@@ -4,11 +4,11 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from phd_parser.kernels import gaussian, pseudo_voigt, pseudo_voigt_area
-from phd_parser.xrd import ReferenceCard, ReflectionFit, XRDData, fit_reflection, scherrer
+from lab_data_parser.kernels import gaussian, pseudo_voigt, pseudo_voigt_area
+from lab_data_parser.xrd import ReferenceCard, ReflectionFit, XRDData, fit_reflection, scherrer
 
 HERE = Path(__file__).parent
-FIXTURE = HERE / "bruker_SK0003_MoO3-12pct-TiO2_12-28deg.xy"
+FIXTURE = HERE / "bruker_MoO3-12pct-TiO2_12-28deg.xy"
 ANATASE = HERE / "PDF 78-2486_TiO2-Anatase.txt"
 
 

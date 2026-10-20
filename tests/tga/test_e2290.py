@@ -2,18 +2,18 @@ import os
 import pandas as pd
 
 
-MOCK_FILE_PATH = os.path.join(os.path.dirname(__file__), r"e2290/2025-08-29_JS0021_30-1000C_R5_100N2.txt")
+MOCK_FILE_PATH = os.path.join(os.path.dirname(__file__), r"e2290/2025-08-29_sample_30-1000C_R5_100N2.txt")
 MOCK_BLA_FILE_PATH = os.path.join(os.path.dirname(__file__), r"e2290/2025-09-03_blank_30-1000C_R5_100N2.txt")
 
 def test_extract_lines():
-    from phd_parser.tga.e2290 import extract_lines
+    from lab_data_parser.tga.e2290 import extract_lines
     lines = extract_lines(MOCK_FILE_PATH)
     assert len(lines) > 0, "Extracted lines should not be empty"
     assert isinstance(lines, list), "Extracted lines should be a list"
     assert all(isinstance(line, str) for line in lines), "All extracted lines should be strings"
 
 def test_split_sections():
-    from phd_parser.tga.e2290 import extract_lines, split_sections
+    from lab_data_parser.tga.e2290 import extract_lines, split_sections
     lines = extract_lines(MOCK_FILE_PATH)
     header, data, results, sample, method = split_sections(lines)
 
@@ -31,7 +31,7 @@ def test_split_sections():
     assert len(method) > 0, "Method should not be empty"
 
 def test_parse_data():
-    from phd_parser.tga.e2290 import extract_lines, split_sections, parse_data_lines
+    from lab_data_parser.tga.e2290 import extract_lines, split_sections, parse_data_lines
     lines = extract_lines(MOCK_FILE_PATH)
     _, data_lines, _, _, _ = split_sections(lines)
     df, units = parse_data_lines(data_lines)
@@ -43,7 +43,7 @@ def test_parse_data():
     assert len(units) == len(df.columns) - 1, "Units length should match number of unit-bearing columns"
 
 def test_read_tga_e2290():
-    from phd_parser.tga.e2290 import read_export
+    from lab_data_parser.tga.e2290 import read_export
     tga_data = read_export(MOCK_FILE_PATH)
 
     assert isinstance(tga_data, dict), "Output should be a dictionary"

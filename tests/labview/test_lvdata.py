@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 
-from phd_parser.labview import LVData
+from lab_data_parser.labview import LVData
 
 TOS_START = pd.Timestamp("2026-04-21 14:00:00", tz="Europe/Amsterdam")
 

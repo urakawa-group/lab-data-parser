@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from phd_parser.spectroscopy import IRData, SpectroscopyData
+from lab_data_parser.spectroscopy import IRData, SpectroscopyData
 
 WAVENUMBER_PER_CM = np.linspace(1000.0, 4000.0, 61)
 

@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from phd_parser.labview import LVData
-from phd_parser.labview.b67box5 import read
+from lab_data_parser.labview import LVData
+from lab_data_parser.labview.b67box5 import read
 
 OLD_HEADER = (
     "timestamp\tReactor T PV\tAnalytic P PV\tVent P PV\t"

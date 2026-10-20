@@ -5,7 +5,7 @@ MOCK_DIR_PATH = Path(os.path.join(os.path.dirname(__file__))) / "omnic-test-data
 MOCK_SINGLE_FILE_PATH = MOCK_DIR_PATH / "Spectrum Index 2718 at 2,46 Hours.spa"
 
 def test_read_spa_single():
-    from phd_parser.spectroscopy.infrared.omnic import read_spa
+    from lab_data_parser.spectroscopy.infrared.omnic import read_spa
     path = MOCK_SINGLE_FILE_PATH
     raw = read_spa(path)
     x = raw["data"]["x"]
@@ -23,18 +23,18 @@ def test_read_spa_single():
 
 def test_read_spa_empty_dir_raises(tmp_path):
     import pytest
-    from phd_parser.spectroscopy.infrared.omnic import read_spa
+    from lab_data_parser.spectroscopy.infrared.omnic import read_spa
     with pytest.raises(FileNotFoundError, match="No .spa files"):
         read_spa(tmp_path)
 
 def test_read_spa_missing_file_raises(tmp_path):
     import pytest
-    from phd_parser.spectroscopy.infrared.omnic import read_spa
+    from lab_data_parser.spectroscopy.infrared.omnic import read_spa
     with pytest.raises(FileNotFoundError):
         read_spa(tmp_path / "nope.spa")
 
 def test_read_spa_dir():
-    from phd_parser.spectroscopy.infrared.omnic import read_spa
+    from lab_data_parser.spectroscopy.infrared.omnic import read_spa
     raw = read_spa(MOCK_DIR_PATH)
     x = raw["data"]["x"]
     v = raw["data"]["v"]
@@ -46,7 +46,7 @@ def test_read_spa_dir():
     assert meta is not None, "Metadata should not be None"
 
 def test_read_spa_single_irdata():
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
     path = MOCK_SINGLE_FILE_PATH
     ir_data = IRData.from_omnic_spa(path)
 
@@ -63,7 +63,7 @@ def test_read_spa_single_irdata():
     assert ir_data.ds.attrs.get("data_type") is not None, "data_type attribute should not be None"
 
 def test_read_spa_dir_irdata():
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
     ir_data = IRData.from_omnic_spa(MOCK_DIR_PATH)
 
     assert ir_data.wavenumber is not None, "Wavenumber data should not be None"

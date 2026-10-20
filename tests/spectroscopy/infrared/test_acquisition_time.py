@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from phd_parser.spectroscopy.infrared import IRData, omnic
+from lab_data_parser.spectroscopy.infrared import IRData, omnic
 
 MOCK_DIR_PATH = Path(os.path.dirname(__file__)) / "omnic-test-data"
 FILES = sorted(MOCK_DIR_PATH.glob("*.spa"), key=omnic.extract_spectrum_id)

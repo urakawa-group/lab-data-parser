@@ -1,9 +1,9 @@
 import numpy as np
 import pytest
 
-from phd_parser.spectroscopy.infrared import IRData
-from phd_parser.spectroscopy.infrared import modulation
-from phd_parser.spectroscopy import SpectroscopyData
+from lab_data_parser.spectroscopy.infrared import IRData
+from lab_data_parser.spectroscopy.infrared import modulation
+from lab_data_parser.spectroscopy import SpectroscopyData
 
 WAVENUMBER_PER_CM = np.linspace(1000.0, 3000.0, 41)
 PERIOD = 600.0

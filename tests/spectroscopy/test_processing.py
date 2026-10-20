@@ -2,7 +2,7 @@
 import numpy as np
 import pytest
 
-from phd_parser.spectroscopy import SpectroscopyData
+from lab_data_parser.spectroscopy import SpectroscopyData
 
 AXIS_PER_CM = np.linspace(1000.0, 3000.0, 201)
 

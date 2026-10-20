@@ -1,6 +1,6 @@
 import pytest
-from phd_parser.xrd.xrd_e1290 import read_xy_e1290
-from phd_parser.xrd.core import XRDData
+from lab_data_parser.xrd.xrd_e1290 import read_xy_e1290
+from lab_data_parser.xrd.core import XRDData
 import numpy as np
 import numpy.typing as npt
 import xarray as xr

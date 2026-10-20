@@ -10,12 +10,12 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from phd_parser import GCData, IRData, LVData, MSData, RamanData
-from phd_parser.history import decode_attr, encode_attr, format_history, suppress_recording
-from phd_parser.spectroscopy import SpectroscopyData
+from lab_data_parser import GCData, IRData, LVData, MSData, RamanData
+from lab_data_parser.history import decode_attr, encode_attr, format_history, suppress_recording
+from lab_data_parser.spectroscopy import SpectroscopyData
 
 AXIS_PER_CM = np.linspace(1000.0, 3000.0, 201)
-MS_FILE = os.path.join(os.path.dirname(__file__), "massspec", "2026-03-26_sk1002_02-react.asc")
+MS_FILE = os.path.join(os.path.dirname(__file__), "massspec", "2026-03-26_drifts-ms_02-react.asc")
 
 
 def _steps(obj) -> list[str]:
@@ -127,7 +127,7 @@ def test_lv_history_and_metadata_survive_netcdf(tmp_path):
     back = LVData.from_netcdf(tmp_path / "lv.nc")
     assert _steps(back) == ["from_dataframe", "rename_species", "smooth_moving", "from_netcdf"]
     # lived only in metadata and was lost on storing before
-    assert back.metadata["species_convention"] == "phd_standard"
+    assert back.metadata["species_convention"] == "standard"
     assert back.ds["F1 CH4 PV"].attrs["species"] == "CH4"
 
 

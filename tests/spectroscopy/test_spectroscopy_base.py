@@ -2,8 +2,8 @@
 import numpy as np
 import pytest
 
-import phd_parser as pp
-from phd_parser.spectroscopy import IRData, RamanData, SpectroscopyData
+import lab_data_parser as ldp
+from lab_data_parser.spectroscopy import IRData, RamanData, SpectroscopyData
 
 AXIS_PER_CM = np.linspace(1000.0, 3000.0, 101)
 
@@ -16,8 +16,8 @@ def ir():
 
 
 def test_the_technique_names_are_readers_of_the_one_class():
-    assert pp.SpectroscopyData is SpectroscopyData
-    assert pp.IRData is pp.spectroscopy.infrared.IRData and pp.RamanData is pp.spectroscopy.raman.RamanData
+    assert ldp.SpectroscopyData is SpectroscopyData
+    assert ldp.IRData is ldp.spectroscopy.infrared.IRData and ldp.RamanData is ldp.spectroscopy.raman.RamanData
     ir = IRData.from_arrays(AXIS_PER_CM, np.ones(AXIS_PER_CM.size))
     raman = RamanData.from_arrays(AXIS_PER_CM, np.ones(AXIS_PER_CM.size), excitation_wavelength_nm=532.0)
     assert type(ir) is type(raman) is SpectroscopyData

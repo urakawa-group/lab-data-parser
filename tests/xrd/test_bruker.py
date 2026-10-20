@@ -5,12 +5,12 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from phd_parser.xrd import XRDData, read_xy
-from phd_parser.xrd.bruker import ANODE_WAVELENGTH_ANGSTROM, parse_header, wavelength_for_anode
-from phd_parser.xrd.xrd_e1290 import read_xy_e1290
+from lab_data_parser.xrd import XRDData, read_xy
+from lab_data_parser.xrd.bruker import ANODE_WAVELENGTH_ANGSTROM, parse_header, wavelength_for_anode
+from lab_data_parser.xrd.xrd_e1290 import read_xy_e1290
 
 HERE = Path(__file__).parent
-FIXTURE = HERE / "bruker_SK0003_MoO3-12pct-TiO2_12-28deg.xy"
+FIXTURE = HERE / "bruker_MoO3-12pct-TiO2_12-28deg.xy"
 FULL_FILE = HERE / "xrd_mock_e1290.xy"  # a complete export of the same instrument
 HEADER = (
     '\'Id: "" Comment: "" Operator: "Lab Manager" Anode: "Cu" Scantype: "Coupled TwoTheta/Theta" '
@@ -96,7 +96,7 @@ def test_unquoted_header_and_three_columns(tmp_path):
 def test_unknown_anode_warns_and_leaves_wavelength_unset(tmp_path, caplog):
     path = tmp_path / "ag.xy"
     path.write_text(HEADER.replace('Anode: "Cu"', 'Anode: "Ag"') + "\n5.0 1.0\n5.1 2.0\n")
-    with caplog.at_level(logging.WARNING, logger="phd_parser.xrd.bruker"):
+    with caplog.at_level(logging.WARNING, logger="lab_data_parser.xrd.bruker"):
         parsed = read_xy(path)
     assert parsed["meta"]["anode"] == "Ag"
     assert parsed["meta"]["wavelength_angstrom"] is None
