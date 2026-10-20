@@ -8,10 +8,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from phd_parser.chromatography import GCData
-from phd_parser.labview import LVData
-from phd_parser.massspec import MSData
-from phd_parser.spectroscopy import IRData
+from lab_data_parser.chromatography import GCData
+from lab_data_parser.labview import LVData
+from lab_data_parser.massspec import MSData
+from lab_data_parser.spectroscopy import IRData
 
 TOS = np.array([0.0, 60.0, 120.0])
 TOS_START = pd.Timestamp("2026-04-21 14:00:00", tz="Europe/Amsterdam")

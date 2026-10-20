@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-from phd_parser.spectroscopy import SpectroscopyData
+from lab_data_parser.spectroscopy import SpectroscopyData
 
 MOCK_DIR_PATH = Path(os.path.dirname(__file__)) / "omnic-test-data"
 MOCK_SINGLE_FILE_PATH = MOCK_DIR_PATH / "Spectrum Index 2718 at 2,46 Hours.spa"
@@ -58,44 +58,44 @@ def test_read_omnic_data_type_attribute():
 # Cross-validation against IRData.from_omnic_spa
 # ----------------------------------------------------------------
 
-def test_wavenumber_axis_agrees_with_phd_parser():
+def test_wavenumber_axis_agrees_with_lab_data_parser():
     import spectrochempy as scp
 
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     nd = scp.read_omnic(MOCK_SINGLE_FILE_PATH)
     ir = IRData.from_omnic_spa(MOCK_SINGLE_FILE_PATH)
 
-    # spectrochempy: wavenumber in cm⁻¹; phd_parser: m⁻¹ (divide by 100 to get cm⁻¹)
+    # spectrochempy: wavenumber in cm⁻¹; lab_data_parser: m⁻¹ (divide by 100 to get cm⁻¹)
     scp_wn = np.sort(nd.x.data.squeeze())
-    phd_wn = np.sort(ir.wavenumber_per_cm)
+    parser_wn = np.sort(ir.wavenumber_per_cm)
 
-    assert scp_wn.size == phd_wn.size
-    np.testing.assert_allclose(scp_wn, phd_wn, rtol=1e-4)
+    assert scp_wn.size == parser_wn.size
+    np.testing.assert_allclose(scp_wn, parser_wn, rtol=1e-4)
 
 
-def test_spectral_values_agree_with_phd_parser():
+def test_spectral_values_agree_with_lab_data_parser():
     import spectrochempy as scp
 
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     nd = scp.read_omnic(MOCK_SINGLE_FILE_PATH)
     ir = IRData.from_omnic_spa(MOCK_SINGLE_FILE_PATH)
 
     # Sort both by ascending wavenumber before comparing
     scp_wn_order = np.argsort(nd.x.data.squeeze())
-    phd_wn_order = np.argsort(ir.wavenumber_per_cm)
+    parser_wn_order = np.argsort(ir.wavenumber_per_cm)
 
     scp_values = nd.data.squeeze()[scp_wn_order]
-    phd_values = ir.values[0][phd_wn_order]
+    parser_values = ir.values[0][parser_wn_order]
 
-    np.testing.assert_allclose(scp_values, phd_values, rtol=1e-4)
+    np.testing.assert_allclose(scp_values, parser_values, rtol=1e-4)
 
 
-def test_scan_count_agrees_with_phd_parser():
+def test_scan_count_agrees_with_lab_data_parser():
     import spectrochempy as scp
 
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     files = sorted(MOCK_DIR_PATH.glob("*.spa"))
     nd = scp.read_omnic(*files)
@@ -110,7 +110,7 @@ def test_scan_count_agrees_with_phd_parser():
 # ----------------------------------------------------------------
 
 def test_from_omnic_spa_backend_spectrochempy_single():
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     # A single file is the one-element case of a series: same structure.
     ir = IRData.from_omnic_spa(MOCK_SINGLE_FILE_PATH, backend="spectrochempy")
@@ -122,7 +122,7 @@ def test_from_omnic_spa_backend_spectrochempy_single():
 
 
 def test_from_omnic_spa_backend_spectrochempy_directory():
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     ir = IRData.from_omnic_spa(MOCK_DIR_PATH, backend="spectrochempy")
     assert ir.ndim == 2
@@ -130,7 +130,7 @@ def test_from_omnic_spa_backend_spectrochempy_directory():
 
 
 def test_from_omnic_spa_backend_omnic_single():
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     ir = IRData.from_omnic_spa(MOCK_SINGLE_FILE_PATH, backend="omnic")
     assert ir.ndim == 2
@@ -140,7 +140,7 @@ def test_from_omnic_spa_backend_omnic_single():
 
 
 def test_from_omnic_spa_single_and_directory_have_the_same_structure():
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     single = IRData.from_omnic_spa(MOCK_SINGLE_FILE_PATH)
     series = IRData.from_omnic_spa(MOCK_DIR_PATH)
@@ -150,7 +150,7 @@ def test_from_omnic_spa_single_and_directory_have_the_same_structure():
 
 
 def test_from_omnic_spa_single_file_applies_tos_start():
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     tos_start = pd.Timestamp("2026-03-26 12:00:00", tz="UTC")
     ir = IRData.from_omnic_spa(MOCK_SINGLE_FILE_PATH, tos_start=tos_start, backend="omnic")
@@ -162,7 +162,7 @@ def test_from_omnic_spa_single_file_applies_tos_start():
 
 
 def test_from_omnic_spa_backends_produce_same_result():
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     ir_scp = IRData.from_omnic_spa(MOCK_SINGLE_FILE_PATH, backend="spectrochempy")
     ir_omnic = IRData.from_omnic_spa(MOCK_SINGLE_FILE_PATH, backend="omnic")
@@ -179,14 +179,14 @@ def test_from_omnic_spa_backends_produce_same_result():
 
 
 def test_from_omnic_spa_rejects_unknown_backend():
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     with pytest.raises(ValueError, match="Unknown backend"):
         IRData.from_omnic_spa(MOCK_SINGLE_FILE_PATH, backend="spectroscopy")
 
 
 def test_from_omnic_spa_rejects_a_second_positional_argument():
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     # Guards against from_omnic_spa(dir, filename) silently landing the
     # filename in wavenumber_2SI_factor.
@@ -195,7 +195,7 @@ def test_from_omnic_spa_rejects_a_second_positional_argument():
 
 
 def test_from_omnic_spa_empty_directory_raises(tmp_path):
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     for backend in ("omnic", "spectrochempy"):
         with pytest.raises(FileNotFoundError, match="No .spa files"):
@@ -203,7 +203,7 @@ def test_from_omnic_spa_empty_directory_raises(tmp_path):
 
 
 def test_from_omnic_spa_missing_file_raises(tmp_path):
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     for backend in ("omnic", "spectrochempy"):
         with pytest.raises(FileNotFoundError):
@@ -211,7 +211,7 @@ def test_from_omnic_spa_missing_file_raises(tmp_path):
 
 
 def test_single_file_read_is_usable_as_a_background():
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     background = IRData.from_omnic_spa(MOCK_SINGLE_FILE_PATH, backend="omnic")
     series = IRData.from_omnic_spa(MOCK_DIR_PATH, backend="omnic")
@@ -226,7 +226,7 @@ def test_single_file_read_is_usable_as_a_background():
 
 
 def test_multi_scan_background_is_rejected():
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     series = IRData.from_omnic_spa(MOCK_DIR_PATH, backend="omnic")
 
@@ -235,7 +235,7 @@ def test_multi_scan_background_is_rejected():
 
 
 def test_from_omnic_spa_auto_uses_spectrochempy_when_available():
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     ir_auto = IRData.from_omnic_spa(MOCK_SINGLE_FILE_PATH, backend="auto")
     ir_scp = IRData.from_omnic_spa(MOCK_SINGLE_FILE_PATH, backend="spectrochempy")
@@ -251,7 +251,7 @@ def test_from_omnic_spa_auto_uses_spectrochempy_when_available():
 
 def test_from_spectrochempy_single_spectrum():
     import spectrochempy as scp
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     nd = scp.read_omnic(MOCK_SINGLE_FILE_PATH)
     ir = SpectroscopyData.from_spectrochempy(nd)
@@ -267,7 +267,7 @@ def test_from_spectrochempy_single_spectrum():
 
 def test_from_spectrochempy_multi_scan():
     import spectrochempy as scp
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     files = sorted(MOCK_DIR_PATH.glob("*.spa"))
     nd = scp.read_omnic(*files)
@@ -280,7 +280,7 @@ def test_from_spectrochempy_multi_scan():
 
 def test_from_spectrochempy_wavenumber_in_si_units():
     import spectrochempy as scp
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     nd = scp.read_omnic(MOCK_SINGLE_FILE_PATH)
     ir = SpectroscopyData.from_spectrochempy(nd)
@@ -292,7 +292,7 @@ def test_from_spectrochempy_wavenumber_in_si_units():
 
 def test_from_spectrochempy_matches_from_omnic_spa():
     import spectrochempy as scp
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     nd = scp.read_omnic(MOCK_SINGLE_FILE_PATH)
     ir_scp = SpectroscopyData.from_spectrochempy(nd)
@@ -311,7 +311,7 @@ def test_from_spectrochempy_matches_from_omnic_spa():
 
 def test_from_spectrochempy_delta_time_seconds():
     import spectrochempy as scp
-    from phd_parser.spectroscopy.infrared import IRData
+    from lab_data_parser.spectroscopy.infrared import IRData
 
     files = sorted(MOCK_DIR_PATH.glob("*.spa"))
     nd = scp.read_omnic(*files)
@@ -327,7 +327,7 @@ def test_backend_keeps_file_order_when_text_and_numeric_order_differ(tmp_path):
     """SpectroChemPy sorts file names as text ("Index 10" before "Index 9"); the spectra must still land on their own times."""
     import shutil
 
-    from phd_parser.spectroscopy import IRData
+    from lab_data_parser.spectroscopy import IRData
 
     sources = sorted(MOCK_DIR_PATH.glob("*.spa"))
     for number, source in enumerate(sources, start=6):          # 6 .. 17: one- and two-digit indices
@@ -344,8 +344,8 @@ def test_backend_refuses_a_pairing_it_cannot_verify(tmp_path, monkeypatch):
     """If a row is not the spectrum of the file it is paired with, the read fails instead of mispairing times."""
     import shutil
 
-    from phd_parser.spectroscopy import IRData
-    from phd_parser.spectroscopy.infrared import spectrochempy as backend
+    from lab_data_parser.spectroscopy import IRData
+    from lab_data_parser.spectroscopy.infrared import spectrochempy as backend
 
     sources = sorted(MOCK_DIR_PATH.glob("*.spa"))
     for number, source in enumerate(sources, start=6):

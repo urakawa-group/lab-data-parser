@@ -5,10 +5,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from phd_parser.massspec import MSData
-from phd_parser.massspec.quadstar import read_export
+from lab_data_parser.massspec import MSData
+from lab_data_parser.massspec.quadstar import read_export
 
-ASC_FILE = Path(__file__).parent / "2026-03-26_sk1002_02-react.asc"
+ASC_FILE = Path(__file__).parent / "2026-03-26_drifts-ms_02-react.asc"
 
 
 def make_ms():

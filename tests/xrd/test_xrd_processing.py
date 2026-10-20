@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from phd_parser.xrd import XRDData
+from lab_data_parser.xrd import XRDData
 
 
 def make_series():

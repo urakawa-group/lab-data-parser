@@ -3,8 +3,8 @@ import numpy as np
 import pytest
 from scipy.signal import fftconvolve
 
-from phd_parser import kernels
-from phd_parser.kernels import (
+from lab_data_parser import kernels
+from lab_data_parser.kernels import (
     Lineshape,
     gaussian,
     gaussian_lorentzian_product,

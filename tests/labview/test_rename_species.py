@@ -1,7 +1,7 @@
 """LVData.rename_species renames the per-channel species attribute only."""
 import pandas as pd
 
-from phd_parser.labview import LVData
+from lab_data_parser.labview import LVData
 
 
 def test_rename_species_changes_only_the_attribute():
@@ -15,5 +15,5 @@ def test_rename_species_changes_only_the_attribute():
     assert renamed.ds["F1 CH4 PV"].attrs["species"] == "CH4"
     assert lv.ds["F1 CH4 PV"].attrs["species"] == "Methan"
     assert "species" not in renamed.ds["T oven"].attrs
-    assert renamed.metadata["species_convention"] == "phd_standard"
+    assert renamed.metadata["species_convention"] == "standard"
     assert renamed.ds["F1 CH4 PV"].values.tolist() == [1.0, 2.0, 3.0]

@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from phd_parser.tpr import TPRData, labview_tcd
+from lab_data_parser.tpr import TPRData, labview_tcd
 
 FIXTURES = Path(__file__).parent / "labview_tcd"
 VARIANT_1 = FIXTURES / "tpr3010_v1.txt"                      # time (s), TCD (H2), FID, TCD (O2), TC 1
@@ -64,7 +64,7 @@ def test_sample_weight_parsing():
 
 
 def test_unnamed_extra_columns_warn_but_do_not_fail(caplog):
-    with caplog.at_level(logging.WARNING, logger="phd_parser.tpr.labview_tcd"):
+    with caplog.at_level(logging.WARNING, logger="lab_data_parser.tpr.labview_tcd"):
         raw = labview_tcd.read_export(VARIANT_1_UNNAMED)
     assert raw["meta"]["format_variant"] == 1 and set(raw["data"]["signals"]) == {"tcd_h2", "tcd_o2", "fid"}
     assert list(raw["data"]["extra"]) == [f"column_{n}" for n in range(6, 13)]
@@ -85,7 +85,7 @@ def test_unknown_named_column_is_kept_with_a_warning(tmp_path, caplog):
     body = [line.rstrip("\t") + "\t25.0" for line in rows]
     path = tmp_path / "tpr_with_mfc.txt"
     path.write_text("\n".join(lines[:column_index + 2] + body) + "\n", encoding="utf-8")
-    with caplog.at_level(logging.WARNING, logger="phd_parser.tpr.labview_tcd"):
+    with caplog.at_level(logging.WARNING, logger="lab_data_parser.tpr.labview_tcd"):
         raw = labview_tcd.read_export(path)
     assert raw["meta"]["column_map"]["MFC H2 (ml/min)"] == "mfc_h2_ml_min"
     assert raw["meta"]["extra_columns"] == {"mfc_h2_ml_min": "MFC H2 (ml/min)"}

@@ -11,7 +11,7 @@ import numpy as np
 import pytest
 from scipy.io import netcdf_file
 
-from phd_parser.chromatography.agilent import ezchrom
+from lab_data_parser.chromatography.agilent import ezchrom
 
 DATA = Path(__file__).parent / "ezchrom-test-data"
 RESULT_SET = DATA / "2025-05-15 16-10-24 (GMT +02-00).rslt"

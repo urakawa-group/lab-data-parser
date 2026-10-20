@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from phd_parser.spectroscopy.infrared import IRData
+from lab_data_parser.spectroscopy.infrared import IRData
 
 WAVENUMBER_PER_CM = np.linspace(1000.0, 4000.0, 31)
 
@@ -68,7 +68,7 @@ def test_tolerance_still_applies_to_a_scalar_target(series):
 
 
 def test_raman_get_evolution_matches_the_same_convention():
-    from phd_parser.spectroscopy.raman import RamanData
+    from lab_data_parser.spectroscopy.raman import RamanData
 
     values = np.arange(4, dtype=float)[:, None] * np.ones(WAVENUMBER_PER_CM.size)
     raman = RamanData.from_arrays(

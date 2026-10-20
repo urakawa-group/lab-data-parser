@@ -4,9 +4,9 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from phd_parser.spectroscopy.infrared import IRData
-from phd_parser.labview import LVData
-from phd_parser.massspec import MSData
+from lab_data_parser.spectroscopy.infrared import IRData
+from lab_data_parser.labview import LVData
+from lab_data_parser.massspec import MSData
 
 TOS_START = pd.Timestamp("2026-04-21 14:00:00", tz="Europe/Amsterdam")
 TOS = np.array([0.0, 60.0, 120.0])

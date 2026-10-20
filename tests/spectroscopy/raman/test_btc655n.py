@@ -1,7 +1,7 @@
 import numpy.typing as npt
 import os
 
-from phd_parser.spectroscopy.raman.btc655n import extract_lines, split_lines, parse_metadata_lines, parse_data_lines, read_export
+from lab_data_parser.spectroscopy.raman.btc655n import extract_lines, split_lines, parse_metadata_lines, parse_data_lines, read_export
 
 MOCK_FILE_PATH = os.path.join(os.path.dirname(__file__), r"btc655n/test_nat_090.txt")
 

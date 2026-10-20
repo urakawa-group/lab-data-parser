@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from phd_parser.naming import SpeciesConvention, get_convention, rename_species
-from phd_parser.naming.species import STANDARD_CONVENTION_PATH, normalize_species_key
+from lab_data_parser.naming import SpeciesConvention, get_convention, rename_species
+from lab_data_parser.naming.species import STANDARD_CONVENTION_PATH, normalize_species_key
 
 
 def test_standard_resolves_the_usual_spellings():
@@ -24,7 +24,7 @@ def test_standard_covers_the_ezchrom_method_names():
                                       "CO2", "H2", "Ar", "N2", "CO"]
 
 
-def test_standard_names_are_those_of_phd_models():
+def test_standard_canonical_names():
     names = set(SpeciesConvention.standard().canonical_names)
     assert {"CO2", "CO", "H2", "MeOH", "H2O", "CH4", "DME", "MF", "EtOH", "PrOH", "Ar", "N2", "He"} <= names
 
@@ -52,7 +52,7 @@ def test_user_convention_from_dict_path_and_flat_form(tmp_path):
     path = tmp_path / "box2.json"
     path.write_text(json.dumps(full))
     assert rename_species("ch4", path) == "Methane"
-    assert rename_species("hydrogen", {"H2": ["H2", "Hydrogen"]}) == "H2"  # phd_ui's flat form
+    assert rename_species("hydrogen", {"H2": ["H2", "Hydrogen"]}) == "H2"  # flat form
 
 
 def test_ambiguous_convention_is_refused():
@@ -70,7 +70,7 @@ def test_json_round_trip(tmp_path):
     path = tmp_path / "copy.json"
     SpeciesConvention.standard().to_json(path)
     assert SpeciesConvention.from_json(path).species == SpeciesConvention.standard().species
-    assert json.loads(STANDARD_CONVENTION_PATH.read_text(encoding="utf-8"))["name"] == "phd_standard"
+    assert json.loads(STANDARD_CONVENTION_PATH.read_text(encoding="utf-8"))["name"] == "standard"
 
 
 def test_matching_key():

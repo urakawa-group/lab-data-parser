@@ -1,8 +1,8 @@
 import os
 
-from phd_parser.massspec.quadstar import extract_lines, split_lines, parse_metadata_lines, parse_data_lines, read_export
+from lab_data_parser.massspec.quadstar import extract_lines, split_lines, parse_metadata_lines, parse_data_lines, read_export
 
-MOCK_FILE_PATH = os.path.join(os.path.dirname(__file__), "2026-03-26_sk1002_02-react.asc")
+MOCK_FILE_PATH = os.path.join(os.path.dirname(__file__), "2026-03-26_drifts-ms_02-react.asc")
 
 def test_extract_lines():
     lines = extract_lines(MOCK_FILE_PATH)

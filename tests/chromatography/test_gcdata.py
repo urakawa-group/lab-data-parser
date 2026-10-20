@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from phd_parser.chromatography import GCData, ezchrom, group_injections
+from lab_data_parser.chromatography import GCData, ezchrom, group_injections
 
 RESULT_SET = Path(__file__).parent / "agilent" / "ezchrom-test-data" / "2025-05-15 16-10-24 (GMT +02-00).rslt"
 
@@ -139,7 +139,7 @@ def test_rename_species_to_the_standard(gc):
     renamed = gc.rename_species()
     assert "MeOH" in set(renamed.get_peaks()["species"]) and "Methanol" not in set(renamed.get_peaks()["species"])
     assert renamed.get_evolution("MeOH").values[0] == gc.get_evolution("Methanol").values[0]
-    assert renamed.ds.attrs["species_convention"] == "phd_standard"
+    assert renamed.ds.attrs["species_convention"] == "standard"
     assert "Methanol" in set(gc.get_peaks()["species"])  # the original is untouched
 
 

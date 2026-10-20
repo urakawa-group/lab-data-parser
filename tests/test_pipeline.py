@@ -4,12 +4,12 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-import phd_parser as pp
-from phd_parser import Pipeline, Step
-from phd_parser.spectroscopy import IRData, SpectroscopyData, XPSData
+import lab_data_parser as ldp
+from lab_data_parser import Pipeline, Step
+from lab_data_parser.spectroscopy import IRData, SpectroscopyData, XPSData
 
 AXIS_PER_CM = np.linspace(1000.0, 3000.0, 201)
-VMS = Path(__file__).parent / "spectroscopy" / "xps" / "vamas" / "SK-0001_3.vms"
+VMS = Path(__file__).parent / "spectroscopy" / "xps" / "vamas" / "sample-0001_3.vms"
 
 
 @pytest.fixture
@@ -97,7 +97,7 @@ def test_pipeline_json_round_trip(tmp_path, series):
     assert back[1].parameters["control_points_cm"] == [1100, 1800, 2900]
     np.testing.assert_allclose(back(series).values, pipeline(series).values)
     assert Pipeline.from_json(text) == back
-    assert pp.Pipeline is Pipeline
+    assert ldp.Pipeline is Pipeline
 
 
 def test_from_history_since_the_last_load_and_nested_lists(tmp_path, series):

@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from phd_parser.physisorption.core import PhysisorptionData
+from lab_data_parser.physisorption.core import PhysisorptionData
 
 MOCK_FILE_PATH = os.path.join(os.path.dirname(__file__), "tristar", "2026-N-198.XLS")
 

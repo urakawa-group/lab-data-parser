@@ -4,10 +4,10 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from phd_parser.spectroscopy.xps import XPSData, avantage, vamas
+from lab_data_parser.spectroscopy.xps import XPSData, avantage, vamas
 
 FIXTURES = Path(__file__).parent
-VMS_MULTI = FIXTURES / "vamas" / "SK-0001_3.vms"
+VMS_MULTI = FIXTURES / "vamas" / "sample-0001_3.vms"
 VMS_SINGLE_REGION_FILE = FIXTURES / "vamas" / "C1s Scan.vms"
 AVG_C1S = FIXTURES / "avantage" / "C1s Scan.avg"
 AVG_SURVEY = FIXTURES / "avantage" / "XPS Survey.avg"

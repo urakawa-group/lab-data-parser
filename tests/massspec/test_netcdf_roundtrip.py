@@ -8,9 +8,9 @@ import os
 
 import numpy as np
 
-from phd_parser.massspec import MSData
+from lab_data_parser.massspec import MSData
 
-MOCK_FILE_PATH = os.path.join(os.path.dirname(__file__), "2026-03-26_sk1002_02-react.asc")
+MOCK_FILE_PATH = os.path.join(os.path.dirname(__file__), "2026-03-26_drifts-ms_02-react.asc")
 
 
 def test_roundtrip_keeps_data_and_dict_attrs(tmp_path):
