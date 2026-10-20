@@ -6,6 +6,12 @@ files with as little lost as possible and hands it over in one consistent form,
 with as much metadata as the files offer. It does not model or plot; that is
 left to the analysis code built on top of it.
 
+## Public repositories
+
+| Repository | Package | Purpose |
+|---|---|---|
+| [urakawa-group/lab-data-parser](https://github.com/urakawa-group/lab-data-parser) | `lab_data_parser` | read and process raw instrument data (this repo) |
+
 ![Scientific Data Processing Pipeline](docs/static/data-processing.png)
 
 > [!WARNING]
