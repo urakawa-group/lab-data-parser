@@ -267,6 +267,9 @@ ms = ldp.MSData.from_quadstar_asc(asc_file, tos_start=tos_start)
 ir = ldp.IRData.from_omnic_spa(dir_spa, tos_start=tos_start)
 ```
 
+> [!TIP]
+> Give `tos_start` a **named timezone** (`tz="Europe/Amsterdam"`), not a fixed offset (`+02:00`). The zone name is stored with the origin (`2026-04-21T14:42:00+02:00[Europe/Amsterdam]`), so timestamps follow daylight saving: a March run anchored to a May origin still shows `+01:00`. Leave `tos_start` out and `LVData` and `MSData` take the start recorded in the file.
+
 #### Changing the origin afterwards
 
 `LVData`, `SpectroscopyData`, `MSData` and `GCData` expose the same four immutable methods, mirroring the `with_` / `set_` / `del_` trio used for backgrounds. What matters is **what stays fixed**:
@@ -828,10 +831,10 @@ temperature = lv.get_channel("Reactor T PV")      # numpy array along lv.tos
 
 ### MS
 
-`MSData` wraps an `xarray.Dataset` with one `DataArray` per datablock, named `block_{id}`. `block_0` carries the m/z channels with dims `(cycle, mz)`; auxiliary blocks (pressure, temperature, analog inputs) have their own channel dims `(cycle, ch_N)`, so mixed units never share an axis. The `cycle` dim is shared, `tos` rides along it, and `tos_start` sits in `ds.attrs`.
+`MSData` wraps an `xarray.Dataset` with one `DataArray` per datablock, named `block_{id}`. `block_0` carries the m/z channels with dims `(cycle, mz)`; auxiliary blocks (pressure, temperature, analog inputs) have their own channel dims `(cycle, ch_N)`, so mixed units never share an axis. The `cycle` dim is shared, `tos` rides along it, and `tos_start` sits in `ds.attrs`. Without a `tos_start` argument, `from_quadstar_asc` takes the start recorded in the file.
 
 - **Constructors**: `from_quadstar_asc` (Pfeiffer Quadstar `.asc`, one file or a directory; a naive `tos_start` is read in the file's timezone), `from_arrays`, `from_netcdf`
-- **Accessors**: `block_ids`, `n_blocks`, `channels`, `mz`, `values`, `unit`, `block_type`, `channel_labels`, `cycle`, `n_cycle`, `tos`, `tos_start`, `timestamps`; `get_trace` (one m/z vs cycle, with optional centred `rolling_window` applied *before* `normalize`), `get_traces`, `get_spectrum`, `get_channel`, `tic`
+- **Accessors**: `block_ids`, `n_blocks`, `channels(block_id)`, `mz` (property), `values`, `unit`, `block_type`, `channel_labels`, `cycle`, `n_cycle`, `tos`, `tos_start`, `timestamps`; `get_trace` (one m/z vs cycle, with optional centred `rolling_window` applied *before* `normalize`), `get_traces`, `get_spectrum`, `get_channel`, `tic`
 - **Processing**: `select_tos_range`, `select_timestamp_range`, the four time-origin methods, `mask_overloaded` (detector saturation spikes around 1e38 become NaN), `smooth_trace_rolling`, `correct_traces` (shift negative traces up to zero), `baseline_subtract`. Every step is also logged in `ds.attrs["trace_corrections"]`
 - **Export**: `to_csv` (one block), `to_netcdf`
 

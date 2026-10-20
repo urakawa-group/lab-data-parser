@@ -13,6 +13,7 @@ import xarray as xr
 
 from lab_data_parser._selection import EmptyWindow, window_mask
 from lab_data_parser.history import records_step
+from lab_data_parser.spectroscopy._common import _check_tos_tolerance
 from lab_data_parser.spectroscopy.units import quantity_of, to_wavenumber
 
 if TYPE_CHECKING:
@@ -102,13 +103,7 @@ class _SelectionMixin:
         if self.tos is None:
             raise ValueError("select_by_tos requires 'tos' coordinate")
 
-        if tolerance_seconds is not None:
-            nearest_dist = float(np.abs(self.tos - target_tos).min())
-            if nearest_dist > tolerance_seconds:
-                raise ValueError(
-                    f"Requested tos {target_tos:.1f}s is {nearest_dist:.1f}s from the nearest scan "
-                    f"(tolerance: {tolerance_seconds:.1f}s)"
-                )
+        _check_tos_tolerance(self.tos, target_tos, tolerance_seconds)
 
         ds_selected = self.ds.sel(tos=target_tos, method=method)
         return self._new(ds=ds_selected)

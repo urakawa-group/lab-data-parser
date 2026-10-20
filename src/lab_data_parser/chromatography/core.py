@@ -14,7 +14,7 @@ import xarray as xr
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from lab_data_parser._selection import EmptyWindow, window_mask
-from lab_data_parser._time import TimeOriginMixin, TimestampLike, _to_timestamp
+from lab_data_parser._time import TimeOriginMixin, TimestampLike, _to_timestamp, encode_tos_start
 from lab_data_parser.history import HistoryMixin
 from lab_data_parser.history import (
     append_history,
@@ -629,7 +629,7 @@ class GCData(TimeOriginMixin, HistoryMixin, BaseModel):
 
         dataset_attrs = dict(attrs or {})
         if origin is not None:
-            dataset_attrs["tos_start"] = origin.isoformat()
+            dataset_attrs["tos_start"] = encode_tos_start(origin)
         ds = xr.Dataset(data_vars, coords=coords, attrs=dataset_attrs)
         ds = _add_analysis(ds, records)
         return cls(ds=ds)

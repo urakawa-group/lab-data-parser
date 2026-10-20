@@ -15,6 +15,7 @@ import numpy as np
 import numpy.typing as npt
 import pandas as pd
 
+from lab_data_parser._time import encode_tos_start
 from lab_data_parser.history import records_step
 from lab_data_parser.spectroscopy.core import _OMNIC_VLABEL_TO_DATA_TYPE, DataType, SpectroscopyData
 
@@ -175,7 +176,7 @@ class IRData:
         attrs: dict[str, Any] = {"technique": TECHNIQUE}
         parsed_tos_start = SpectroscopyData._parse_tos_start(tos_start, raw["meta"].get("tos_start"), strict_tos_start)
         if parsed_tos_start is not None:
-            attrs["tos_start"] = parsed_tos_start.isoformat()
+            attrs["tos_start"] = encode_tos_start(parsed_tos_start)
 
         vlabel = raw["meta"].get("vlabel", "")
         data_type = _OMNIC_VLABEL_TO_DATA_TYPE.get(vlabel)

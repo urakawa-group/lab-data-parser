@@ -1,4 +1,7 @@
+from pathlib import Path
+
 import numpy as np
+import pandas as pd
 import pytest
 
 from lab_data_parser.labview import LVData
@@ -106,3 +109,22 @@ def test_netcdf_roundtrip_of_a_directory_read(tmp_path):
     assert back.channels == lv.channels
     np.testing.assert_allclose(back.get_channel(lv.channels[0]), lv.get_channel(lv.channels[0]))
     assert lv.ds.attrs["filename_timestamp"] is None  # the instance is untouched
+
+
+REAL_EXPORT_DIR = Path(__file__).parent / "b67box5"
+
+
+def test_real_export_directory():
+    """Three consecutive exports of one run (excerpt), read as one directory."""
+    lv = LVData.from_b67_box5_txt(REAL_EXPORT_DIR)
+    assert lv.n_samples == 139 + 7 + 120
+    assert lv.channels[:3] == ["Reactor T PV", "Analytic P PV", "Vent P PV"]
+    assert np.all(np.diff(lv.tos) > 0)
+    assert lv.tos_start == pd.Timestamp("2026-03-26 15:15:03", tz="Europe/Amsterdam")
+    assert lv.timestamps[-1] == pd.Timestamp("2026-03-26 15:37:15", tz="Europe/Amsterdam")
+    np.testing.assert_allclose(lv.get_channel("Reactor T PV")[:3], 36.111)  # comma decimals
+
+
+def test_reader_options_are_keyword_only():
+    with pytest.raises(TypeError):
+        LVData.from_b67_box5_txt(REAL_EXPORT_DIR, None)

@@ -2,7 +2,7 @@
 
 ``LVData``, ``SpectroscopyData``, ``MSData`` and ``GCData`` all store elapsed
 seconds (``tos``) along their sample axis and one absolute origin,
-``tos_start``, as an ISO string in ``ds.attrs``. :class:`TimeOriginMixin` is
+``tos_start``, as a string in ``ds.attrs`` (see :func:`encode_tos_start`). :class:`TimeOriginMixin` is
 the one implementation of everything that follows from that: the
 ``tos_start`` and ``timestamps`` properties, the four origin operations
 ``with_tos_start`` / ``set_tos_start`` / ``del_tos_start`` /
@@ -16,6 +16,7 @@ empty=...)``. A host that keeps the origin somewhere else as well
 ``_tos_start_raw`` and ``_with_tos_start``.
 """
 
+import re
 from datetime import datetime
 from typing import Any, Optional, Union
 
@@ -60,6 +61,61 @@ def _to_timestamp(value: TimestampLike, reference: Optional[pd.Timestamp] = None
     return timestamp
 
 
+_ZONE_SUFFIX = re.compile(r"^(?P<iso>[^\[]+)\[(?P<zone>[^\]]+)\]$")
+
+
+def _zone_name(timestamp: pd.Timestamp) -> Optional[str]:
+    """The IANA name of the timestamp's timezone, or ``None`` for a fixed offset or naive time."""
+    tzinfo = timestamp.tzinfo
+    name = getattr(tzinfo, "key", None) or getattr(tzinfo, "zone", None)
+    return name if isinstance(name, str) and ("/" in name or name == "UTC") else None
+
+
+def encode_tos_start(tos_start: pd.Timestamp) -> str:
+    """Serialise an origin as ISO 8601, with the IANA zone appended when it has one.
+
+    ``isoformat()`` alone keeps only the offset of that one instant
+    (``+02:00``), so a run read with a summer origin would show winter
+    timestamps at ``+02:00`` too. The zone suffix (RFC 9557,
+    ``2026-04-21T14:42:00+02:00[Europe/Amsterdam]``) keeps daylight saving.
+
+    Parameters
+    ----------
+    tos_start : pandas.Timestamp
+        The origin to store.
+
+    Returns
+    -------
+    str
+        The ISO string, followed by ``[zone]`` for a named timezone.
+    """
+    tos_start = pd.Timestamp(tos_start)
+    zone = _zone_name(tos_start)
+    return tos_start.isoformat() + (f"[{zone}]" if zone else "")
+
+
+def decode_tos_start(raw: Any) -> Optional[pd.Timestamp]:
+    """Read an origin written by :func:`encode_tos_start` (or a plain ISO string).
+
+    Parameters
+    ----------
+    raw : str, pandas.Timestamp or None
+        The stored origin.
+
+    Returns
+    -------
+    pandas.Timestamp or None
+        The origin, in its named timezone when one was stored.
+    """
+    if raw is None:
+        return None
+    if isinstance(raw, str):
+        match = _ZONE_SUFFIX.match(raw.strip())
+        if match:
+            return pd.Timestamp(match["iso"]).tz_convert(match["zone"])
+    return pd.Timestamp(raw)
+
+
 class TimeOriginMixin:
     """The ``tos_start`` family and the wall-clock window, for any class with ``tos`` and ``ds``.
 
@@ -78,7 +134,7 @@ class TimeOriginMixin:
         if tos_start is None:
             attrs.pop("tos_start", None)
         else:
-            attrs["tos_start"] = tos_start.isoformat()
+            attrs["tos_start"] = encode_tos_start(tos_start)
         ds.attrs = attrs
         return self._new(ds)
 
@@ -87,8 +143,7 @@ class TimeOriginMixin:
     @property
     def tos_start(self) -> Optional[pd.Timestamp]:
         """Absolute time of ``tos = 0``, or ``None`` if the data carry no origin."""
-        raw = self._tos_start_raw()
-        return None if raw is None else pd.Timestamp(raw)
+        return decode_tos_start(self._tos_start_raw())
 
     @property
     def timestamps(self) -> Optional[pd.DatetimeIndex]:

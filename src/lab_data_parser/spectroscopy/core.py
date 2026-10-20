@@ -33,7 +33,7 @@ import pandas as pd
 import xarray as xr
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from lab_data_parser._time import TimeOriginMixin
+from lab_data_parser._time import TimeOriginMixin, encode_tos_start
 from lab_data_parser.history import HistoryMixin, records_step
 from lab_data_parser.spectroscopy._axis import _AxisMixin
 from lab_data_parser.spectroscopy._background import _BackgroundMixin
@@ -262,7 +262,7 @@ class SpectroscopyData(
         if excitation_wavelength_nm is not None:
             attrs["excitation_wavelength_nm"] = float(excitation_wavelength_nm)
         if tos_start is not None:
-            attrs["tos_start"] = pd.Timestamp(tos_start).isoformat()
+            attrs["tos_start"] = encode_tos_start(pd.Timestamp(tos_start))
 
         ds = cls._build_ds(wavenumber_si, values, tos=tos, attrs=attrs)
         return cls(ds=ds, metadata=metadata or {})

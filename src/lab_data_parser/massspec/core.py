@@ -11,7 +11,7 @@ import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 from lab_data_parser._selection import EmptyWindow, window_mask
-from lab_data_parser._time import TimeOriginMixin
+from lab_data_parser._time import TimeOriginMixin, encode_tos_start
 from lab_data_parser.history import HistoryMixin
 from lab_data_parser.history import records_step
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -235,6 +235,7 @@ class MSData(TimeOriginMixin, HistoryMixin, BaseModel):
         da = self._block(block_id)
         return da.coords[_channel_dim(block_id)].values
 
+    @property
     def mz(self) -> npt.NDArray:
         """m/z grid of the primary block in Daltons.
 
@@ -930,7 +931,7 @@ class MSData(TimeOriginMixin, HistoryMixin, BaseModel):
 
         attrs: dict[str, Any] = dict(ds_attrs or {})
         if tos_start is not None:
-            attrs["tos_start"] = pd.Timestamp(tos_start).isoformat()
+            attrs["tos_start"] = encode_tos_start(pd.Timestamp(tos_start))
 
         data_vars: dict[str, xr.DataArray] = {}
         for block_id in sorted(channels.keys()):
@@ -1044,6 +1045,7 @@ class MSData(TimeOriginMixin, HistoryMixin, BaseModel):
     def from_quadstar_asc(
         cls,
         filepath: Union[str, Path],
+        *,
         tos_start: Optional[Union[str, pd.Timestamp]] = None,
         drop_threshold_cols: bool = True,
         tz_str: str = "Europe/Amsterdam",
@@ -1063,7 +1065,9 @@ class MSData(TimeOriginMixin, HistoryMixin, BaseModel):
             Absolute start time for the run.  When provided together with a
             ``Timestamp`` column in the data, time-on-stream is computed as
             elapsed seconds from this reference.  Accepts any string
-            parseable by ``pandas.to_datetime``.
+            parseable by ``pandas.to_datetime``.  ``None`` (default) takes
+            the start of the measurement recorded in the file, as
+            ``LVData.from_b67_box5_txt`` does.
         drop_threshold_cols : bool, optional
             If ``True`` (default) threshold/qualifier columns are dropped from
             the parsed DataFrame before building the dataset.
@@ -1107,6 +1111,13 @@ class MSData(TimeOriginMixin, HistoryMixin, BaseModel):
             if tos_start.tzinfo is None:
                 # the file's timestamps are localised to tz_str: a naive origin means that wall clock
                 tos_start = tos_start.tz_localize(tz_str)
+
+        if tos_start is None and "Timestamp" in df.columns and len(df):
+            # the recorded start: first timestamp minus its relative time, so tos keeps RelTime[s]
+            first_timestamp = pd.Timestamp(df["Timestamp"].iloc[0])
+            first_relative_s = float(df["RelTime[s]"].iloc[0]) if "RelTime[s]" in df.columns else 0.0
+            tos_start = first_timestamp - pd.Timedelta(seconds=first_relative_s)
+            logger.info(f"tos_start not provided, using the recorded start of the measurement: {tos_start}.")
 
         tos: Optional[npt.NDArray] = None
         if tos_start is not None and "Timestamp" in df.columns:

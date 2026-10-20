@@ -13,6 +13,7 @@ import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 
+from lab_data_parser._time import decode_tos_start, encode_tos_start
 from lab_data_parser.history import records_step
 from lab_data_parser.spectroscopy._common import (
     BACKGROUND_REFERENCED_TYPES,
@@ -300,7 +301,7 @@ class _MergeMixin:
 
         attrs = {**second["attrs"], **first["attrs"]}
         if first["tos_start"] is not None:
-            attrs["tos_start"] = first["tos_start"].isoformat()
+            attrs["tos_start"] = encode_tos_start(first["tos_start"])
         else:
             attrs.pop("tos_start", None)
         attrs["merge_log"] = json.dumps(
@@ -549,7 +550,7 @@ class _MergeMixin:
         return {
             "values": data.values[None, :] if is_1d else data.values,
             "tos": tos,
-            "tos_start": pd.Timestamp(raw_tos_start) if raw_tos_start is not None else None,
+            "tos_start": decode_tos_start(raw_tos_start),
             "background": ds["background"].values if "background" in ds else None,
             "background_attrs": dict(ds["background"].attrs) if "background" in ds else None,
             "baseline": (
