@@ -18,7 +18,7 @@ The number of blank header lines and of trailing tabs varies between files.
 Some variant-1 files carry further columns without a name in the column line
 (constant numbers, most likely a stale MS block); they are kept under
 ``column_<n>`` with a warning, as is any named column this module does not
-know (see *Instrument exports drift over time* in ``CLAUDE.md``). Detector
+know (see *Instrument exports drift over time* in ``CONTRIBUTING.md``). Detector
 signals are stored as the file gives them, in mV and with their raw sign.
 """
 

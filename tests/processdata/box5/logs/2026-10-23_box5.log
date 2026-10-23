@@ -1,0 +1,11 @@
+2026-10-23T09:00:00.000+02:00	INFO	service	connected: reading every device, nothing written
+2026-10-23T09:00:30.000+02:00	ERROR	plant.readings	F2-5-Ar read failed
+	Traceback (most recent call last):
+	  File "mk_box5.py", line 55, in session
+	    raise TimeoutError("no reply from node 5")
+	TimeoutError: no reply from node 5
+2026-10-23T09:01:00.000+02:00	INFO	service	valve switch observed: feed 1 -> 2
+2026-10-23T09:01:59.000+02:00	INFO	service	disconnected
+2026-10-23T10:00:00.000+02:00	INFO	service	connected: reading every device, nothing written
+2026-10-23T10:00:29.000+02:00	INFO	service	disconnected
+2026-10-23T23:59:40.000+02:00	INFO	service	connected: reading every device, nothing written

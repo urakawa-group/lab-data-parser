@@ -1067,7 +1067,7 @@ class MSData(TimeOriginMixin, HistoryMixin, BaseModel):
             elapsed seconds from this reference.  Accepts any string
             parseable by ``pandas.to_datetime``.  ``None`` (default) takes
             the start of the measurement recorded in the file, as
-            ``LVData.from_b67_box5_txt`` does.
+            ``ProcessData.from_day_log`` does.
         drop_threshold_cols : bool, optional
             If ``True`` (default) threshold/qualifier columns are dropped from
             the parsed DataFrame before building the dataset.

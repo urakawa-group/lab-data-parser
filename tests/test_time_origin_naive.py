@@ -9,7 +9,7 @@ import pandas as pd
 import pytest
 
 from lab_data_parser.chromatography import GCData
-from lab_data_parser.labview import LVData
+from lab_data_parser.processdata import ProcessData
 from lab_data_parser.massspec import MSData
 from lab_data_parser.spectroscopy import IRData
 
@@ -30,7 +30,7 @@ def make_ms():
 
 def make_lv():
     frame = pd.DataFrame({"timestamp": TOS_START + pd.to_timedelta(TOS, unit="s"), "Reactor T PV": [1.0, 2.0, 3.0]})
-    return LVData.from_dataframe(frame, tos_start=TOS_START)
+    return ProcessData.from_dataframe(frame, tos_start=TOS_START)
 
 
 def make_gc():

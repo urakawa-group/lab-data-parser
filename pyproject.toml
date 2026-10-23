@@ -1,7 +1,7 @@
 [project]
 name = "lab-data-parser"
 version = "0.2.0"
-description = "Read and process the raw data of catalysis lab instruments (IR, Raman, MS, GC, LabView, XRD, TGA, physisorption) into one consistent xarray form, with provenance."
+description = "Read and process the raw data of catalysis lab instruments (IR, Raman, MS, GC, process data, XRD, TGA, physisorption) into one consistent xarray form, with provenance."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -34,7 +34,9 @@ spectrochempy = ["spectrochempy>=0.8.1"]
 ramanspy = ["ramanspy>=0.2.10"]
 # reading .spa files from http(s) URLs
 url = ["requests>=2.32"]
-all = ["lab-data-parser[spectrochempy,ramanspy,url]"]
+# reading the Zarr day stores of the lab-control software
+zarr = ["zarr>=3.0"]
+all = ["lab-data-parser[spectrochempy,ramanspy,url,zarr]"]
 
 [dependency-groups]
 dev = [
@@ -44,6 +46,7 @@ dev = [
     "spectrochempy>=0.8.1",
     "ramanspy>=0.2.10",
     "requests>=2.32",
+    "zarr>=3.0",
 ]
 
 [project.urls]

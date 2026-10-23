@@ -5,7 +5,7 @@ as a list of steps, run it on one spectrum or on a whole folder of them, and
 keep it next to the results. Here a step is simply the name of a method of
 the data class plus its keyword arguments, so a pipeline works for every
 class of the package alike (``SpectroscopyData``, ``XPSData``, ``MSData``,
-``LVData``, ``GCData``, ...), needs no wrapper per operation, and is plain
+``ProcessData``, ``GCData``, ...), needs no wrapper per operation, and is plain
 JSON: ``to_json`` / ``from_json`` store it with the processed data.
 
 Because every method records itself in the object's history with its

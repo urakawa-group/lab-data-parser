@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from lab_data_parser import GCData, IRData, LVData, MSData, RamanData
+from lab_data_parser import GCData, IRData, MSData, ProcessData, RamanData
 from lab_data_parser.history import decode_attr, encode_attr, format_history, suppress_recording
 from lab_data_parser.spectroscopy import SpectroscopyData
 
@@ -114,21 +114,20 @@ def test_ms_history_and_trace_corrections_survive_netcdf(tmp_path):
     assert [entry["method"] for entry in back.ds.attrs["trace_corrections"]] == ["min_shift"]
 
 
-def test_lv_history_and_metadata_survive_netcdf(tmp_path):
+def test_process_data_history_and_attributes_survive_netcdf(tmp_path):
     frame = pd.DataFrame({
         "timestamp": pd.date_range("2025-01-01 10:00", periods=4, freq="10s"),
-        "F1 CH4 PV": [1.0, 2.0, 3.0, 4.0],
+        "F1 CH4": [1.0, 2.0, 3.0, 4.0],
     })
-    lv = LVData.from_dataframe(frame, channel_meta={"F1 CH4 PV": {"unit": "mL/min", "species": "Methan"}})
-    renamed = lv.rename_species().smooth_moving(2)
+    data = ProcessData.from_dataframe(frame, channel_meta={"F1 CH4": {"unit": "mLn/min", "species": "Methan"}})
+    renamed = data.rename_species().smooth_moving(2)
     assert _steps(renamed) == ["from_dataframe", "rename_species", "smooth_moving"]
 
-    renamed.to_netcdf(tmp_path / "lv.nc")
-    back = LVData.from_netcdf(tmp_path / "lv.nc")
+    renamed.to_netcdf(tmp_path / "process.nc")
+    back = ProcessData.from_netcdf(tmp_path / "process.nc")
     assert _steps(back) == ["from_dataframe", "rename_species", "smooth_moving", "from_netcdf"]
-    # lived only in metadata and was lost on storing before
-    assert back.metadata["species_convention"] == "standard"
-    assert back.ds["F1 CH4 PV"].attrs["species"] == "CH4"
+    assert back.ds.attrs["species_convention"] == "standard"
+    assert back.ds["species"].sel(channel="F1 CH4").item() == "CH4"
 
 
 @pytest.mark.parametrize("value", [None, True, {"a": [1, 2]}, ["x", "y"], [], "Methan → CH₄"])

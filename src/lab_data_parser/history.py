@@ -186,9 +186,9 @@ def suppress_recording():
 def append_history(obj: Any, step: str, parameters: dict[str, Any], owner: Any = None) -> Any:
     """Return ``obj`` with one more history entry (for steps a decorator cannot wrap).
 
-    A class that keeps its attributes outside ``ds`` too (``LVData`` and its
-    ``metadata``) defines ``_with_history(history)``; for every other class
-    the history goes into ``ds.attrs``.
+    A class that keeps its attributes outside ``ds`` too defines
+    ``_with_history(history)``; for every other class the history goes into
+    ``ds.attrs``.
 
     Parameters
     ----------
