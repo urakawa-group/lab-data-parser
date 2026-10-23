@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 
 from lab_data_parser.spectroscopy.infrared import IRData
-from lab_data_parser.labview import LVData
+from lab_data_parser.processdata import ProcessData
 from lab_data_parser.massspec import MSData
 
 TOS_START = pd.Timestamp("2026-04-21 14:00:00", tz="Europe/Amsterdam")
@@ -29,7 +29,7 @@ def make_lv():
         "timestamp": [TOS_START + pd.Timedelta(seconds=float(t)) for t in TOS],
         "Reactor T PV": [100.0, 200.0, 300.0, 400.0],
     })
-    return LVData.from_dataframe(df, tos_start=TOS_START)
+    return ProcessData.from_dataframe(df, tos_start=TOS_START)
 
 
 def make_ms():
@@ -43,7 +43,7 @@ def make_ms():
 
 
 BUILDERS = [pytest.param(make_ir, id="IRData"),
-            pytest.param(make_lv, id="LVData"),
+            pytest.param(make_lv, id="ProcessData"),
             pytest.param(make_ms, id="MSData")]
 
 

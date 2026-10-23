@@ -1,6 +1,6 @@
 """The time origin shared by every time-resolved class: ``tos`` in seconds plus one ``tos_start``.
 
-``LVData``, ``SpectroscopyData``, ``MSData`` and ``GCData`` all store elapsed
+``ProcessData``, ``SpectroscopyData``, ``MSData`` and ``GCData`` all store elapsed
 seconds (``tos``) along their sample axis and one absolute origin,
 ``tos_start``, as a string in ``ds.attrs`` (see :func:`encode_tos_start`). :class:`TimeOriginMixin` is
 the one implementation of everything that follows from that: the
@@ -12,7 +12,7 @@ A host class provides ``ds`` (an ``xarray.Dataset`` with a ``tos``
 coordinate), ``tos`` (the coordinate as an array or ``None``), ``_new(ds)``
 (a copy around another Dataset) and ``select_tos_range(min_s, max_s,
 empty=...)``. A host that keeps the origin somewhere else as well
-(``LVData`` mirrors it into ``metadata``) overrides the two hooks
+overrides the two hooks
 ``_tos_start_raw`` and ``_with_tos_start``.
 """
 

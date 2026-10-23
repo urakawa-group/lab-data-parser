@@ -1,0 +1,2 @@
+﻿time (UTC),time (local),kind,feed before,feed after,sent (UTC),confirmed (UTC),step,cycle,note
+2026-10-23T07:01:00.000Z,2026-10-23T09:01:00.000+02:00,observed,1,2,,2026-10-23T07:01:00.000Z,,,seen by read-back
