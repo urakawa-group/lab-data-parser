@@ -51,7 +51,10 @@ logger = logging.getLogger(__name__)
 PathLike = Union[str, Path]
 
 FORMAT_PATTERN = re.compile(r"^(?P<software>[\w-]+) day log, (?P<kind>\w+), version (?P<version>\d+)$")
-SUPPORTED_VERSION = 1
+SUPPORTED_VERSION = 1  # a software not named below
+# per software, the newest layout this reader knows; box5-control 2 added a controller's
+# target, working, requested SP and owner (2026-10-24), the columns Box 2 has written since 1
+SUPPORTED_VERSIONS = {"box2-control": 1, "box5-control": 2}
 
 # The column fields of a channel: column word -> (variable, kind). "float" is a value
 # in the channel's unit (or the device's for device PV / SP), the others are codes.
@@ -252,9 +255,10 @@ def _check_format(value: Optional[str], path: Path) -> None:
     match = FORMAT_PATTERN.match(value or "")
     if match is None:
         raise ValueError(f"{path.name} is not a lab-control day log (first line: '# format: {value}')")
-    if int(match["version"]) > SUPPORTED_VERSION:
+    known = SUPPORTED_VERSIONS.get(match["software"], SUPPORTED_VERSION)
+    if int(match["version"]) > known:
         raise ValueError(
-            f"{path.name} is a {value!r}; this reader knows version {SUPPORTED_VERSION}. "
+            f"{path.name} is a {value!r}; this reader knows version {known}. "
             "Update lab-data-parser (the layout changed, see the software's docs/data-format.md)."
         )
 
