@@ -20,6 +20,7 @@ from lab_data_parser.processdata.labcontrol import daylog
 HERE = Path(__file__).parent
 BOX2 = HERE / "box2"
 BOX5 = HERE / "box5"
+BOX5_V2 = HERE / "box5_v2"  # box5-control version 2: the setpoints (2026-10-24)
 CONTROLLER = BOX2 / "controller" / "2026-10-23_box2.csv"
 
 
@@ -185,6 +186,24 @@ def test_a_newer_format_version_is_refused(tmp_path):
     path.write_text(CONTROLLER.read_text(encoding="utf-8-sig").replace("version 1", "version 2", 1), encoding="utf-8")
     with pytest.raises(ValueError, match="version 2"):
         ProcessData.from_day_log(path)
+
+
+def test_box5_version_2_keeps_each_controllers_setpoints():
+    data = ProcessData.from_day_log(BOX5_V2 / "data", events=False)
+    assert {"target", "working", "requested", "owner"} <= set(data.fields)
+    target = data.get_channel("FIC-101", "target")
+    assert np.isnan(target[:3]).all() and (target[3:] == 30.0).all()  # set once armed
+    assert data.get_channel("FIC-104", "owner")[-1] == 3  # CO: the safe state's
+    assert data.get_channel("FIC-104", "target")[-1] == 0.0
+    assert (data.get_channel("FIC-101", "owner")[3:] == 0).all()  # manual
+
+
+def test_box5_version_3_is_refused(tmp_path):
+    source = BOX5_V2 / "data" / "2026-10-24_box5.csv"
+    path = tmp_path / "2026-10-24_box5.csv"
+    path.write_text(source.read_text(encoding="utf-8-sig").replace("version 2", "version 3", 1), encoding="utf-8")
+    with pytest.raises(ValueError, match="knows version 2"):
+        ProcessData.from_day_log(path, events=False)
 
 
 def test_a_shared_folder_needs_the_set_up(tmp_path):
