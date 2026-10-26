@@ -7,6 +7,10 @@ import pytest
 from lab_data_parser.physisorption.tristar import _extract_bet, _extract_isotherm, _parse_value, read_export
 
 MOCK_FILE_PATH = os.path.join(os.path.dirname(__file__), "tristar", "2026-N-198.XLS")
+# an export whose selected reports also include Langmuir and Freundlich
+LANGMUIR_FILE_PATH = os.path.join(os.path.dirname(__file__), "tristar", "2026-N-211.XLS")
+# an export whose selected reports also include the Temkin pair and the log plot
+TEMKIN_FILE_PATH = os.path.join(os.path.dirname(__file__), "tristar", "2026-N-353.XLS")
 
 
 # ----------------------------------------------------------------
@@ -110,6 +114,30 @@ def test_read_export_analyses_groups_present():
     for name, entry in analyses.items():
         assert "report" in entry and "plots" in entry
         assert entry["report"] is not None
+
+
+def test_read_export_langmuir_and_freundlich_groups():
+    analyses = read_export(LANGMUIR_FILE_PATH)["meta"]["analyses"]
+    assert "surface_area" in analyses["langmuir"]["plots"]
+    assert analyses["langmuir"]["report"]["scalars"]
+    assert analyses["freundlich"]["report"]["table"] is not None
+
+
+def test_read_export_temkin_group():
+    analyses = read_export(TEMKIN_FILE_PATH)["meta"]["analyses"]
+    assert "temkin" in analyses
+    assert "temkin" in analyses["temkin"]["plots"]
+    scalars = analyses["temkin"]["report"]["scalars"]
+    assert "Correlation coefficient" in scalars
+    table = analyses["temkin"]["report"]["table"]
+    assert table["columns"][:2] == ["Absolute Pressure (mmHg)", "Quantity Adsorbed (cm³/g STP)"]
+
+
+def test_read_export_identifies_every_block(caplog):
+    """No block of a fully-selected export is left unidentified."""
+    with caplog.at_level("WARNING"):
+        read_export(TEMKIN_FILE_PATH)
+    assert not [r for r in caplog.records if "section title" in r.message]
 
 
 def test_read_export_bet_plots_present():
