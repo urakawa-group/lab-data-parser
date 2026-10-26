@@ -15,6 +15,10 @@ adsorption.report["analyses"]["t_plot"]         # everything else MicroActive re
 
 **TriStar II 3020** (`lab_data_parser.physisorption.tristar.read_export`): parses a MicroActive "print selected reports to Excel" export, where every report is its own block of columns separated by a `"|"` divider, with a generic state machine for `key: value` rows, notes and one data table per block. The report labels change capitalisation between exports ("BET Surface Area" in 2026-07, "BET surface area" earlier), so every lookup goes through `tristar.scalar`, which ignores case.
 
+Which reports an export holds depends on what was selected in MicroActive, so `report["analyses"]` only carries the groups that are actually there. Recognised: `isotherm`, `bet`, `langmuir`, `freundlich`, `temkin`, `t_plot`, `bjh_adsorption`, `bjh_desorption`, each a `{"report", "plots"}` pair. A block whose title is not in `tristar.SECTION_TITLES` is skipped with a warning and its data is lost, so when a new export logs "Could not identify a known section title", add the title (and its analysis group) rather than ignoring it.
+
+One trap in the BJH tables: the printed `Pore Width Range` is rounded to 0.1 nm, which collapses to a zero-width class (`2.8 - 2.8`) wherever the series is finer than that. Use the full-precision `Average Width` column and rebuild the class edges from it when forming a dV/dlog(w) distribution.
+
 ---
 
 See also: [examples/physisorption.ipynb](../../examples/physisorption.ipynb); the [instruments overview](README.md).

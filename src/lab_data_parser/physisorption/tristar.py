@@ -38,6 +38,8 @@ SECTION_TITLES = [
     "Langmuir Surface Area Plot",
     "Freundlich Tabular Report",
     "Freundlich Plot",
+    "Temkin Tabular Report",
+    "Temkin Plot",
     "t-Plot Report",
     "t-Plot",
     "BJH Adsorption Pore Distribution Report",
@@ -236,6 +238,18 @@ ANALYSIS_GROUPS: dict[str, dict[str, Any]] = {
         "report": "BET Report",
         "plots": {"surface_area": "BET Surface Area Plot"},
     },
+    "langmuir": {
+        "report": "Langmuir Report",
+        "plots": {"surface_area": "Langmuir Surface Area Plot"},
+    },
+    "freundlich": {
+        "report": "Freundlich Tabular Report",
+        "plots": {"freundlich": "Freundlich Plot"},
+    },
+    "temkin": {
+        "report": "Temkin Tabular Report",
+        "plots": {"temkin": "Temkin Plot"},
+    },
     "t_plot": {
         "report": "t-Plot Report",
         "plots": {"thickness_curve": "t-Plot"},
@@ -284,8 +298,10 @@ def read_export(filepath: Union[str, Path]) -> dict[str, Any]:
             block), ``"summary"`` (the Summary Report section, usually
             only populated when multiple samples were compared),
             ``"analyses"`` (dict keyed by analysis name, ``"isotherm"``,
-            ``"bet"``, ``"t_plot"``, ``"bjh_adsorption"``,
-            ``"bjh_desorption"``: each a ``{"report", "plots"}`` dict;
+            ``"bet"``, ``"langmuir"``, ``"freundlich"``, ``"temkin"``,
+            ``"t_plot"``, ``"bjh_adsorption"``, ``"bjh_desorption"``, only
+            those the export actually contains: each a
+            ``{"report", "plots"}`` dict;
             ``"report"`` and each entry of ``"plots"`` is a
             ``{"scalars", "table", "notes"}`` dict as produced by
             :func:`_parse_block_rows`), and ``"sample_log"`` (the Sample
