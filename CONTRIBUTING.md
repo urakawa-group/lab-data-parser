@@ -325,6 +325,7 @@ The contract between them is the list of common *injection records*
 - Every detector has its own `retention_time_<detector>` dim, even when the axes are identical, so one code path covers instruments that sample detectors differently.
 - Different run lengths are padded with NaN. A different sampling interval within one detector is never resampled: `group_injections` splits such records and `from_injections` raises, pointing there.
 - The analysis (peak table along `peak`, amounts along `(injection, species)`) is one per object and named in `attrs["analysis_source"]`. An own integration returns a new object; the vendor's stays on the original.
+- Which folders a reader was given is resolved by the vendor module, not the core: `ezchrom.find_result_sets` takes one `.rslt` folder, several, or a folder holding them (searched recursively if it holds none directly), and sorts them by name unless `sort=False`. A path that is not a directory, and a searched folder with no result set, raise `FileNotFoundError` rather than reading zero injections.
 
 ### Species naming conventions
 

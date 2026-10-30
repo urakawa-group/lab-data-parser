@@ -674,15 +674,21 @@ class GCData(TimeOriginMixin, HistoryMixin, BaseModel):
     @classmethod
     @records_step
     def from_ezchrom_rslt(cls, paths: Union[str, Path, Sequence[Union[str, Path]]],
-                          tos_start: Optional[TimestampLike] = None) -> "GCData":
+                          tos_start: Optional[TimestampLike] = None, sort: bool = True) -> "GCData":
         """Read one or more Agilent OpenLab EZChrom ``.rslt`` folders into one series.
 
         Parameters
         ----------
         paths : str, Path or sequence of them
-            ``.rslt`` folders, e.g. a reduction and a reaction sequence.
+            One ``.rslt`` folder, several of them (e.g. a reduction and a
+            reaction sequence), or a folder holding them, which is then
+            searched; see :func:`~lab_data_parser.chromatography.agilent.ezchrom.find_result_sets`.
         tos_start : timestamp-like, optional
             Origin of ``tos``; defaults to the first injection.
+        sort : bool, optional
+            Sort the folders by name, which is chronological (default True).
+            It sets whose metadata the dataset keeps; the injections are put
+            in time order either way.
 
         Returns
         -------
@@ -691,28 +697,44 @@ class GCData(TimeOriginMixin, HistoryMixin, BaseModel):
 
         Raises
         ------
+        FileNotFoundError
+            If a path is not a directory, or a searched folder holds no result set.
         ValueError
             If the folders' detector axes cannot be stacked; use
             :meth:`from_ezchrom_rslt_groups` for such data.
         """
-        records, attrs = _read_ezchrom(paths)
+        records, attrs = _read_ezchrom(paths, sort=sort)
         return cls.from_injections(records, attrs=attrs, tos_start=tos_start)
 
     @classmethod
     def from_ezchrom_rslt_groups(cls, paths: Union[str, Path, Sequence[Union[str, Path]]],
-                                 tos_start: Optional[TimestampLike] = None) -> list["GCData"]:
+                                 tos_start: Optional[TimestampLike] = None, sort: bool = True) -> list["GCData"]:
         """Like :meth:`from_ezchrom_rslt`, but returns one ``GCData`` per group of stackable injections.
 
         Never fails on differing detector axes: injections whose axes differ
         (a method changed mid-sequence) end up in separate objects that share
         one ``tos_start``.
 
+        Parameters
+        ----------
+        paths : str, Path or sequence of them
+            As :meth:`from_ezchrom_rslt`.
+        tos_start : timestamp-like, optional
+            Origin of ``tos``; defaults to the first injection.
+        sort : bool, optional
+            Sort the folders by name (default True).
+
         Returns
         -------
         list[GCData]
             One per group, in time order of each group's first injection.
+
+        Raises
+        ------
+        FileNotFoundError
+            If a path is not a directory, or a searched folder holds no result set.
         """
-        records, attrs = _read_ezchrom(paths)
+        records, attrs = _read_ezchrom(paths, sort=sort)
         times = [pd.Timestamp(record["injection_time"]) for record in records if record.get("injection_time") is not None]
         origin = pd.Timestamp(tos_start) if tos_start is not None else (min(times) if times else None)
         groups = group_injections(records)
@@ -720,7 +742,7 @@ class GCData(TimeOriginMixin, HistoryMixin, BaseModel):
             logger.warning(f"Detector axes differ between injections; building {len(groups)} GCData objects.")
         with suppress_recording():
             objects = [cls.from_injections([records[index] for index in group], attrs=attrs, tos_start=origin) for group in groups]
-        parameters = {"paths": to_json_safe(paths), "tos_start": to_json_safe(tos_start)}
+        parameters = {"paths": to_json_safe(paths), "tos_start": to_json_safe(tos_start), "sort": sort}
         return [append_history(obj, "from_ezchrom_rslt_groups", {**parameters, "group": number})
                 for number, obj in enumerate(objects)]
 
@@ -915,11 +937,11 @@ def _add_analysis(ds: xr.Dataset, records: Sequence[dict[str, Any]]) -> xr.Datas
     return ds
 
 
-def _read_ezchrom(paths: Union[str, Path, Sequence[Union[str, Path]]]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+def _read_ezchrom(paths: Union[str, Path, Sequence[Union[str, Path]]],
+                  sort: bool = True) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     from lab_data_parser.chromatography.agilent import ezchrom
 
-    if isinstance(paths, (str, Path)):
-        paths = [paths]
+    paths = ezchrom.find_result_sets(paths, sort=sort)
     records: list[dict[str, Any]] = []
     attrs: dict[str, Any] = {}
     for path in paths:
