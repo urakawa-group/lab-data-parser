@@ -40,7 +40,8 @@ largest relative deviation 5.8e-8, i.e. float32 rounding of the export):
   ``Detector Trace Handler`` stream (FID ``pA``, TCD ``25 µV``).
 - ACAML peak ``Height``, ``Area``, ``LevelStart``, ``LevelEnd`` are in counts
   and counts s, not in detector units. ``RetentionTime``, ``BeginTime``,
-  ``EndTime`` are in minutes.
+  ``EndTime`` are in minutes. ``LevelStart`` and ``LevelEnd`` are missing from
+  an occasional peak; its baseline level becomes NaN.
 
 All parsers return plain dicts with ``"data"`` and ``"meta"`` keys.
 """
@@ -53,6 +54,7 @@ import sqlite3
 import struct
 import tempfile
 import xml.etree.ElementTree as ET
+from collections.abc import Sequence
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -685,6 +687,55 @@ def read_method_acaml(file_path: str | Path) -> dict[str, Any]:
 # --------------------------------------------------------------------------
 # whole result set
 # --------------------------------------------------------------------------
+def find_result_sets(paths: str | Path | Sequence[str | Path], sort: bool = True) -> list[Path]:
+    """Resolve what the readers accept into a list of ``.rslt`` folders.
+
+    A path is taken as a result set when its name ends in ``.rslt``, or when
+    it holds ``.dat`` files (a folder that was renamed). Any other folder is
+    searched for ``*.rslt`` inside it, and recursively if it holds none, so a
+    sequence folder, its parent, and a parent of numbered subfolders all work.
+
+    Parameters
+    ----------
+    paths : str, Path or sequence of them
+        A ``.rslt`` folder, several of them, or a folder holding them.
+    sort : bool, optional
+        Sort the folders by name (default True). Their names begin with the
+        instrument and the acquisition time, so this is chronological. It sets
+        which sequence's metadata the dataset keeps and the order of
+        ``attrs["source_folders"]``; the injections themselves are put in time
+        order either way. False keeps the order given, folders found inside a
+        searched folder alphabetically.
+
+    Returns
+    -------
+    list of Path
+        The result-set folders, without duplicates.
+
+    Raises
+    ------
+    FileNotFoundError
+        If a path is not a directory, or a searched folder holds no result set.
+    """
+    if isinstance(paths, (str, Path)):
+        paths = [paths]
+    folders: list[Path] = []
+    for path in paths:
+        path = Path(path)
+        if not path.is_dir():
+            raise FileNotFoundError(f"Not a directory: {path}")
+        if path.suffix.lower() == ".rslt" or any(path.glob("*.dat")):
+            folders.append(path)
+            continue
+        found = sorted(path.glob("*.rslt")) or sorted(path.rglob("*.rslt"))
+        if not found:
+            raise FileNotFoundError(f"No .rslt folder in {path}")
+        logger.debug(f"{path.name}: found {len(found)} result set(s).")
+        folders += found
+    folders = list(dict.fromkeys(folders))
+    return sorted(folders) if sort else folders
+
+
 def read_result_set(directory: str | Path, include_method_xml: bool = False) -> dict[str, Any]:
     """Read a whole ``.rslt`` folder: every injection's raw traces and results, plus the sequence files.
 
@@ -707,8 +758,15 @@ def read_result_set(directory: str | Path, include_method_xml: bool = False) -> 
         ``"meta"``: the sequence ACAML metadata, both method ACAMLs, the
         strings of the ``.rst`` and ``.cfg`` containers, and the instrument
         method XML.
+
+    Raises
+    ------
+    FileNotFoundError
+        If `directory` is not a directory.
     """
     directory = Path(directory)
+    if not directory.is_dir():
+        raise FileNotFoundError(f"Not a directory: {directory}")
     injection_acamls = sorted(directory.glob("*.acam_"))
     sequence_acamls = sorted(directory.glob("*.acaml"))
     results: dict[str, dict[str, Any]] = {}
@@ -867,6 +925,15 @@ def to_injections(result_set: dict[str, Any]) -> dict[str, Any]:
         peaks = []
         for peak in injection["peaks"]:
             factor = scale.get(peak["signal"], np.nan)
+            levels = {}
+            for key, field in (("LevelStart", "baseline_start_value"), ("LevelEnd", "baseline_end_value")):
+                # ACAML leaves the baseline level out of an occasional peak; the peak itself stays valid
+                if key not in peak:
+                    logger.warning(
+                        f"{Path(injection['meta']['file']).name}: peak '{peak.get('species') or peak['signal']}' "
+                        f"at {peak['RetentionTime']:.3f} min has no {key}; its baseline level is NaN."
+                    )
+                levels[field] = peak[key] * factor if key in peak else np.nan
             peaks.append(dict(
                 detector=names.get(peak["signal"], peak["signal"]),
                 species=peak.get("species") or "",
@@ -875,8 +942,7 @@ def to_injections(result_set: dict[str, Any]) -> dict[str, Any]:
                 end_time=peak["EndTime"] * _MINUTES_TO_SECONDS,
                 baseline_start_time=peak["BaselineStart"] * _MINUTES_TO_SECONDS,
                 baseline_end_time=peak["BaselineEnd"] * _MINUTES_TO_SECONDS,
-                baseline_start_value=peak["LevelStart"] * factor,
-                baseline_end_value=peak["LevelEnd"] * factor,
+                **levels,
                 height=peak["Height"] * factor,
                 area=peak["Area"] * factor,
                 area_percent=peak.get("AreaPercent"),

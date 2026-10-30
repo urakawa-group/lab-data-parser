@@ -107,3 +107,40 @@ def test_compound_file_rejects_other_files(tmp_path):
     path.write_bytes(b"plain text, not a container")
     with pytest.raises(ValueError):
         ezchrom.CompoundFile(path)
+
+
+def test_read_result_set_rejects_a_missing_folder(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        ezchrom.read_result_set(tmp_path / "does not exist.rslt")
+
+
+def test_peak_without_a_baseline_level_becomes_nan():
+    result_set = ezchrom.read_result_set(RESULT_SET)
+    peak = result_set["data"]["injections"][0]["peaks"][0]
+    del peak["LevelStart"], peak["LevelEnd"]
+    converted = ezchrom.to_injections(result_set)
+    record = converted["injections"][0]["peaks"][0]
+    assert np.isnan(record["baseline_start_value"]) and np.isnan(record["baseline_end_value"])
+    assert record["area"] > 0  # the rest of the peak is still read
+
+
+def test_find_result_sets_accepts_a_folder_a_list_and_a_parent(tmp_path):
+    assert ezchrom.find_result_sets(RESULT_SET) == [RESULT_SET]
+    assert ezchrom.find_result_sets(str(RESULT_SET)) == [RESULT_SET]
+    assert ezchrom.find_result_sets(DATA) == [RESULT_SET]  # the parent, searched
+    assert ezchrom.find_result_sets(DATA.parent) == [RESULT_SET]  # and recursively
+    assert ezchrom.find_result_sets([DATA, RESULT_SET]) == [RESULT_SET]  # duplicates dropped
+
+    first, second = tmp_path / "01_reduction.rslt", tmp_path / "02_reaction.rslt"
+    first.mkdir()
+    second.mkdir()
+    assert ezchrom.find_result_sets([second, first]) == [first, second]
+    assert ezchrom.find_result_sets([second, first], sort=False) == [second, first]
+    assert ezchrom.find_result_sets(tmp_path) == [first, second]
+
+
+def test_find_result_sets_rejects_a_missing_or_empty_folder(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        ezchrom.find_result_sets(tmp_path / "does not exist")
+    with pytest.raises(FileNotFoundError):
+        ezchrom.find_result_sets(tmp_path)  # a folder without a result set
