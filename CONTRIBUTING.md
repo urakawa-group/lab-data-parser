@@ -322,7 +322,7 @@ The contract between them is the list of common *injection records*
 `to_injections()` that produces them, so a new vendor never touches the core.
 
 - The `injection` dim is always present (length 1 for a single measurement); `tos` runs along it.
-- Every detector has its own `retention_time_<detector>` dim, even when the axes are identical, so one code path covers instruments that sample detectors differently.
+- Every detector has its own `retention_time_<detector>` dim, even when the axes are identical, so one code path covers instruments that sample detectors differently. That name is the dataset's business: `get_chromatogram` hands out one detector, where there is nothing to distinguish, so every detector comes out as the same object, named `chromatogram` with dims `(injection, retention_time)` and the detector in `attrs["detector"]` (which the dataset variables carry too, so the NetCDF keeps it).
 - Different run lengths are padded with NaN. A different sampling interval within one detector is never resampled: `group_injections` splits such records and `from_injections` raises, pointing there.
 - The analysis (peak table along `peak`, amounts along `(injection, species)`) is one per object and named in `attrs["analysis_source"]`. An own integration returns a new object; the vendor's stays on the original.
 - Which folders a reader was given is resolved by the vendor module, not the core: `ezchrom.find_result_sets` takes one `.rslt` folder, several, or a folder holding them (searched recursively if it holds none directly), and sorts them by name unless `sort=False`. A path that is not a directory, and a searched folder with no result set, raise `FileNotFoundError` rather than reading zero injections.
