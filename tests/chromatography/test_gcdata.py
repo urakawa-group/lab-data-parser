@@ -47,10 +47,11 @@ def test_chromatogram_is_the_parsed_signal(gc):
 
 def test_chromatogram_slices_like_numpy(gc):
     every = gc.get_chromatogram("fid")
-    assert every.dims == ("injection", "retention_time_fid")
+    assert every.dims == ("injection", "retention_time")  # the dataset's retention_time_fid, plainly named
+    assert gc.ds["fid"].dims == ("injection", "retention_time_fid")
     window = every[0, 100:200]
     assert window.shape == (100,)
-    assert window["retention_time_fid"].values[0] == pytest.approx(5.0)
+    assert window["retention_time"].values[0] == pytest.approx(5.0)
 
 
 def test_analysis_in_si_and_detector_units(gc):
@@ -148,3 +149,14 @@ def test_rename_species_refuses_to_merge_two_species():
     record["species"].append(dict(detector="fid", species="carbon monoxide", amount=0.1, area=1.0, height=1.0))
     with pytest.raises(ValueError, match="merges"):
         GCData.from_injections([record]).rename_species()
+
+
+def test_every_detector_gives_the_same_shape_of_array(gc):
+    fid, tcd = gc.get_chromatogram("fid"), gc.get_chromatogram("tcd")
+    assert fid.name == tcd.name == "chromatogram"
+    assert fid.dims == tcd.dims == ("injection", "retention_time")
+    assert fid.attrs["detector"] == "fid" and tcd.attrs["detector"] == "tcd"
+    assert gc.ds["fid"].attrs["detector"] == "fid"  # and in the dataset, so the NetCDF carries it
+    assert fid.attrs["unit"] != tcd.attrs["unit"]  # the rest of the attrs stay the detector's own
+    one = gc.get_chromatogram("tcd", injection=0)
+    assert one.name == "chromatogram" and one.dims == ("retention_time",) and one.attrs["detector"] == "tcd"

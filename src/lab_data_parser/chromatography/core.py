@@ -223,12 +223,28 @@ class GCData(TimeOriginMixin, HistoryMixin, BaseModel):
         Returns
         -------
         xarray.DataArray
-            Dims ``(injection, retention_time_<detector>)``, or the 1-D
-            retention time dim for one injection. Slices like a numpy array
-            (``chromatogram[3, 100:200]``, ``chromatogram.values``) and keeps
-            ``tos`` and the retention times as coordinates.
+            Named ``"chromatogram"``, dims ``(injection, retention_time)``, or
+            ``retention_time`` alone for one injection. Every detector gives
+            the same shape of object: the dataset's
+            ``retention_time_<detector>`` comes out under its plain name and
+            the detector is in ``attrs["detector"]``, beside ``unit``,
+            ``vendor_name``, ``sampling_interval`` and ``scale_factor``.
+            Slices like a numpy array (``chromatogram[3, 100:200]``,
+            ``chromatogram.values``) and keeps ``tos`` and the retention times
+            as coordinates.
+
+        Notes
+        -----
+        Two detectors' arrays therefore share the dim name and xarray aligns
+        them in arithmetic, which is meaningful only where their axes agree:
+        detectors sampled differently intersect to the times they have in
+        common. The dataset keeps the axes apart under
+        ``retention_time_<detector>``.
         """
-        data = self._detector(detector)
+        data = (self._detector(detector)
+                .rename({_retention_time_dim(detector): "retention_time"})
+                .rename("chromatogram")
+                .assign_attrs(detector=detector))
         if injection is None:
             return data
         return data.isel(injection=self._position(injection))
@@ -890,7 +906,7 @@ def _stack_detector(name: str, records: Sequence[dict[str, Any]]) -> xr.DataArra
         start = int(np.round(detector["retention_time"][0] / interval)) - first
         values[row, start:start + len(detector["values"])] = detector["values"]
     reference = present[0]
-    attrs = {"unit": reference.get("unit", ""), "vendor_name": reference.get("vendor_name", name),
+    attrs = {"detector": name, "unit": reference.get("unit", ""), "vendor_name": reference.get("vendor_name", name),
              "sampling_interval": float(round(interval, 9))}
     if reference.get("scale_factor"):
         attrs["scale_factor"] = float(reference["scale_factor"])
