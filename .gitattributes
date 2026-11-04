@@ -1,0 +1,2 @@
+# hook scripts run under sh, CRLF would break them
+.githooks/* text eol=lf

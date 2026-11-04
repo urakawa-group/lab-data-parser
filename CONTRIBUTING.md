@@ -132,6 +132,16 @@ Applies to code comments, docstrings, printed/repr output, and figures (titles, 
 - Fonts: two open families, Source Sans 3 and Source Serif 4. Source Sans 3 is used for all figure and slide text, with hierarchy by size and weight, never a second sans. Maths matches the body text it sits beside: Source Serif 4 in print figures and documents, Source Sans 3 italic on slides. Words and units upright, quantities italic. Matplotlib uses mathtext, not usetex. Slides use Source Sans 3 (embedded in the pptx) instead of Segoe UI. LaTeX documents: LuaLaTeX, Source Serif 4 body, Source Sans 3 headings and captions, unicode-math with Source Serif 4 letters over STIX Two Math symbols.
 - Citing a paper where the reference stands alone, on a slide or in a source line on a figure (set 2026-10-18; not for running text, where the document's own citation style applies, numbered or a short author-year form, and the bibliography follows that same style): `<first author> et al. (<group lead>), <journal abbreviation> <year>`, e.g. `Vico van Berkel et al. (Urakawa), J. Catal. 2024`. The bracket names the professor or well-known name behind the paper, usually the last author, and is dropped when the first author is that name (`Urakawa et al., J. Phys. Chem. C 2019`). Two authors: `Maeder & Zilian, Chemom. Intell. Lab. Syst. 1988`; one: `Noda, Appl. Spectrosc. 1993`. Journal abbreviations as Zotero gives them (ISO 4, with dots).
 
+## Commits and coding assistants
+
+- No coding-assistant attribution in commits or pull requests: no
+  `Co-Authored-By: Claude`, no `Claude-Session:`, no "Generated with" lines.
+  Commits go under Julius's name; assistants are credited in prose where
+  wanted, never in the history. Enforced by `.claude/settings.json`
+  (attribution off) and `.githooks/commit-msg`, which strips such lines and
+  keeps human co-authors; run `git config core.hooksPath .githooks` once
+  after cloning.
+
 ## Architecture
 
 **lab-data-parser** (`lab_data_parser`) is a data-parsing library for experimental equipment used in catalysis research (Urakawa group, TU Delft). It is under active development and the API changes frequently.

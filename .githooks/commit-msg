@@ -1,0 +1,10 @@
+#!/bin/sh
+# Remove coding-assistant attribution from the commit message (see AGENTS.md):
+# Co-Authored-By lines naming Claude, Anthropic or Copilot, and Claude-Session lines.
+# Then drop trailing empty lines. Activate once per clone:
+#   git config core.hooksPath .githooks
+msg="$1"
+tmp="$msg.tmp"
+grep -v -i -E '^(co-authored-by:.*(claude|anthropic|copilot)|claude-session:)' "$msg" \
+  | awk '{ line[NR] = $0 } NF { last = NR } END { for (i = 1; i <= last; i++) print line[i] }' > "$tmp"
+mv "$tmp" "$msg"
